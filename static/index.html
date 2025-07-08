@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinAssist Copilot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'finassist': {
+                            'bg-light': '#FFFFFF',
+                            'bg-dark': '#181818',
+                            'panel-light': '#F8F8F8',
+                            'panel-dark': '#232323',
+                            'border-light': '#FFB347',
+                            'border-dark': '#FF9900',
+                            'text-light': '#222222',
+                            'text-dark': '#FFFFFF',
+                            'accent1': '#FFB347',
+                            'accent2': '#FF9900',
+                            'accent3': '#FF6600',
+                        }
+                    },
+                    backgroundImage: {
+                        'orange-gradient': 'linear-gradient(90deg, #FFB347 0%, #FF9900 60%, #FF6600 100%)',
+                    }
+                }
+            }
+        }
+    </script>
+   
+    <link rel="stylesheet" href="src/css/app.css">
+</head>
+<body class="h-full bg-finassist-bg-light dark:bg-finassist-bg-dark text-finassist-text-light dark:text-finassist-text-dark overflow-hidden transition-colors duration-300">
+    <div id="split-container" class="flex h-full w-full">
+        <!-- Sidebar gauche (18%) -->
+        <div id="sidebar-left" class="min-w-[160px] max-w-[260px] w-[18vw] bg-finassist-panel-light dark:bg-finassist-panel-dark doc-sidebar rounded-r-2xl p-3 border-r border-finassist-border-light dark:border-finassist-border-dark flex flex-col transition-colors duration-300 overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-4 text-center bg-orange-gradient bg-clip-text text-transparent flex items-center justify-center gap-2">
+                <span class="inline-block align-middle">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="13" width="3" height="8" rx="1" fill="url(#chartOrange)"/>
+                        <rect x="8.5" y="9" width="3" height="12" rx="1" fill="url(#chartOrange)"/>
+                        <rect x="14" y="5" width="3" height="16" rx="1" fill="url(#chartOrange)"/>
+                        <defs>
+                            <linearGradient id="chartOrange" x1="0" y1="0" x2="0" y2="1" gradientTransform="scale(24)">
+                                <stop offset="0%" stop-color="#FFB347"/>
+                                <stop offset="60%" stop-color="#FF9900"/>
+                                <stop offset="100%" stop-color="#FF6600"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </span>
+                Documents
+            </h2>
+            <div class="space-y-3">
+                <button id="upload-btn" class="w-full p-3 bg-white dark:bg-finassist-bg-dark border border-finassist-border-light dark:border-finassist-border-dark rounded-xl cursor-pointer transition-all duration-200 hover:border-finassist-accent2 hover:scale-105 card-3d text-center font-semibold bg-orange-gradient bg-clip-text text-transparent flex items-center justify-center gap-2">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" class="inline-block align-middle">
+                        <path d="M12 5v14m7-7H5" stroke="url(#plusOrange)" stroke-width="2" stroke-linecap="round"/>
+                        <defs>
+                            <linearGradient id="plusOrange" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#FFB347"/>
+                                <stop offset="100%" stop-color="#FF6600"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    Add Document
+                </button>
+                <input type="file" id="file-input" class="hidden" accept="application/pdf" multiple>
+                <hr class="border-finassist-border-light dark:border-finassist-border-dark my-2">
+                <div id="documents-list" class="space-y-2"></div>
+            </div>
+        </div>
+        <!-- Visionneuse centrale (54%) -->
+        <div id="viewer-main" class="flex-1 min-w-[320px] max-w-[100vw] bg-finassist-bg-light dark:bg-finassist-bg-dark p-6 flex flex-col h-full transition-colors duration-300 overflow-hidden" style="width:54vw;">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center space-x-3">
+                    <h2 class="text-2xl font-bold bg-orange-gradient bg-clip-text text-transparent flex items-center gap-2">
+                        <span class="inline-block align-middle">
+                            <svg width="26" height="26" fill="none" viewBox="0 0 24 24">
+                                <rect x="4" y="3" width="16" height="18" rx="2" fill="url(#docOrange)"/>
+                                <rect x="7" y="7" width="10" height="2" rx="1" fill="#fff" fill-opacity=".7"/>
+                                <rect x="7" y="11" width="7" height="2" rx="1" fill="#fff" fill-opacity=".7"/>
+                                <defs>
+                                    <linearGradient id="docOrange" x1="0" y1="0" x2="1" y2="1">
+                                        <stop offset="0%" stop-color="#FFB347"/>
+                                        <stop offset="100%" stop-color="#FF6600"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </span>
+                        Viewer
+                    </h2>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="zoom-controls" class="hidden items-center space-x-2 bg-finassist-panel-light dark:bg-finassist-panel-dark p-1 rounded-xl card-3d">
+                        <button id="zoom-out-btn" class="px-3 py-1 rounded-lg hover:bg-finassist-accent1 transition-colors font-bold text-lg">-</button>
+                        <span id="zoom-level-text" class="px-2 w-16 text-center font-semibold text-finassist-text-light dark:text-finassist-text-dark text-sm">100%</span>
+                        <button id="zoom-in-btn" class="px-3 py-1 rounded-lg hover:bg-finassist-accent1 transition-colors font-bold text-lg">+</button>
+                    </div>
+                    <button id="theme-toggle" class="ml-2 px-3 py-1 rounded-xl font-bold border border-finassist-border-light dark:border-finassist-border-dark bg-white dark:bg-finassist-panel-dark text-finassist-accent2 dark:text-finassist-accent1 shadow hover:scale-105 transition-all flex items-center">
+                        <span id="theme-toggle-icon"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="flex-1 relative overflow-hidden bg-white/80 dark:bg-black/20 rounded-2xl transition-colors duration-300">
+                <div id="loading" class="hidden absolute inset-0 flex items-center justify-center bg-finassist-bg-light/80 dark:bg-finassist-bg-dark/80 z-20 backdrop-blur-sm">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-finassist-accent2"></div>
+                </div>
+                <div id="pdf-container" class="h-full overflow-y-auto scrollbar-hidden">
+                    <div id="pdf-pages" class="flex flex-col items-center space-y-4 p-4"></div>
+                </div>
+                <div id="welcome-message" class="absolute inset-0 flex items-center justify-center z-10">
+                    <div class="text-center py-20">
+                        <div class="card-3d bg-finassist-panel-light dark:bg-finassist-panel-dark rounded-2xl p-8 max-w-md mx-auto">
+                            <h3 class="text-xl font-bold mb-4 bg-orange-gradient bg-clip-text text-transparent flex items-center gap-2">
+                                <span class="inline-block align-middle">
+                                    <svg width="26" height="26" fill="none" viewBox="0 0 24 24">
+                                        <circle cx="12" cy="12" r="10" fill="url(#robotOrange)"/>
+                                        <rect x="8" y="10" width="8" height="5" rx="2.5" fill="#fff" fill-opacity=".7"/>
+                                        <circle cx="10" cy="12.5" r="1" fill="#FF9900"/>
+                                        <circle cx="14" cy="12.5" r="1" fill="#FF9900"/>
+                                        <defs>
+                                            <linearGradient id="robotOrange" x1="0" y1="0" x2="1" y2="1">
+                                                <stop offset="0%" stop-color="#FFB347"/>
+                                                <stop offset="100%" stop-color="#FF6600"/>
+                                            </linearGradient>
+                                        </defs>
+                                    </svg>
+                                </span>
+                                Welcome to FinAssist Copilot
+                            </h3>
+                            <p class="text-finassist-text-light dark:text-finassist-text-dark mb-6">Select or add a PDF document on the left to get started.</p>
+                            <div class="text-sm text-finassist-accent2">
+                                <p>Financial Analysis</p>
+                                <p>Business Insights</p>
+                                <p>AI-Powered Assistant</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Sidebar droite (28%) -->
+        <div id="sidebar-right" class="min-w-[260px] max-w-[500px] w-[28vw] bg-finassist-panel-light dark:bg-finassist-panel-dark chat-sidebar rounded-l-2xl p-4 border-l border-finassist-border-light dark:border-finassist-border-dark flex flex-col transition-colors duration-300 overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-4 text-center bg-orange-gradient bg-clip-text text-transparent flex items-center gap-2 justify-center">
+                <span class="inline-block align-middle">
+                    <svg width="26" height="26" fill="none" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" fill="url(#robotOrange2)"/>
+                        <rect x="8" y="10" width="8" height="5" rx="2.5" fill="#fff" fill-opacity=".7"/>
+                        <circle cx="10" cy="12.5" r="1" fill="#FF9900"/>
+                        <circle cx="14" cy="12.5" r="1" fill="#FF9900"/>
+                        <defs>
+                            <linearGradient id="robotOrange2" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#FFB347"/>
+                                <stop offset="100%" stop-color="#FF6600"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </span>
+                FinAssist AI
+            </h2>
+            <div id="chat-messages" class="flex-1 overflow-y-auto chat-history mb-4 space-y-3 rounded-xl p-3">
+                <div id="typing-indicator" class="flex items-center gap-2 text-finassist-accent2 text-sm hidden">
+                    <span class="animate-bounce">...</span>
+                    <span>FinAssist is typing</span>
+                </div>
+            </div>
+            <div id="chat-bottom-wrapper" style="position:relative;">
+                <div id="doc-drop-zone" class="dropzone-overlay"></div>
+                <div id="chat-doc-context" class="badge-overlay mb-2 flex flex-wrap gap-2 doc-context-empty"></div>
+                <div id="chat-input-bar" class="w-full mt-auto">
+                    <div class="flex items-end gap-2 p-4 rounded-xl shadow-md border transition-colors duration-200 bg-finassist-panel-light dark:bg-finassist-panel-dark border-finassist-border-light dark:border-finassist-border-dark chat-input-bar">
+                        <textarea
+                            id="chat-textarea"
+                            rows="2"
+                            maxlength="1000"
+                            class="flex-1 resize-none bg-transparent focus:outline-none text-finassist-text-light dark:text-finassist-text-dark placeholder-contrast px-2 py-3 rounded-xl"
+                            placeholder="Ask a question like: 'What are the key insights on page 2?'"
+                            aria-label="Type your message"
+                            style="min-height: 56px; max-height: 180px;"
+                        ></textarea>
+                        <button
+                            id="send-button"
+                            class="ml-2 px-4 py-2 rounded-xl font-bold bg-finassist-accent2 text-white shadow hover:scale-105 transition-all flex items-center justify-center"
+                            aria-label="Send message"
+                            type="button"
+                        >
+                            <span class="inline-block transition-transform" id="send-icon">
+                                <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+                                    <path d="M3 12h13M14 7l6 5-6 5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/split.js/dist/split.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script type="module" src="src/js/app.js"></script>
+</body>
+</html> 
