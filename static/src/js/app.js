@@ -466,64 +466,42 @@ class FinAssistCopilot {
     }
     
     formatAIResponse(message) {
-        // Supprime toutes les lignes qui ne contiennent que des # (titres markdown inutiles)
-        message = message.replace(/^#+\s*$/gm, '');
-        // Fusionne les ':' seuls avec le titre précédent (ex: '**Titre**\n:' -> '**Titre :**')
-        message = message.replace(/(\*\*[^\*]+\*\*)\s*\n\s*:/g, '$1 :');
-        // Fusionne les titres en gras suivis de deux-points sur la même ligne (ex: '**Titre** :')
-        message = message.replace(/(\*\*[^\*]+\*\*)\s*:/g, '$1 :');
-        // Supprime les lignes qui ne contiennent qu'un tiret ou une puce vide
-        message = message.replace(/^\s*[-•]\s*$/gm, '');
-        // Regroupe numéro + titre dans la même balise markdown pour un style cohérent
-        message = message.replace(/(\d+)\.\s+\*\*([^\*]+)\*\*/g, '**$1. $2**');
-        // Fusionne les numéros et titres sur une seule ligne (ex: 1.\nTitre -> 1. Titre)
-        let merged = message.replace(/(\d+)\.\s*\n([A-Z][A-Za-z0-9 \-']{2,})/g, (m, num, title) => `${num}. ${title.trim()}`);
-        // Correction : fusionne les listes numérotées où le numéro, le titre et le range de pages sont sur des lignes séparées
-        merged = merged.replace(/(\d+)\.\s*\n([A-Za-z0-9 \-']+)\s*\n\((Pages? [^\)]+)\):?\s*(.*?)(?=(\n\d+\.|$))/gs,
-            (m, num, title, pages, rest) => `${num}. **${title.trim()} (${pages.trim()}):** ${rest.trim()}`
-        );
-        // Échapper le HTML pour éviter les injections
-        let formatted = this.escapeHtml(merged);
+        // 1. Supprimer tous les titres Markdown (##, ###, etc.)
+        message = message.replace(/^#+\s*(.*)$/gm, '');
 
-        // Titres de document en gras sur une ligne seule
-        formatted = formatted.replace(/\n?\*\*(.+?)\*\*\n/g, '<div class="doc-title-block">$1</div>');
+        // 2. Remplacer les listes à puces markdown par <ul><li>...</li></ul>
+        // On regroupe les lignes commençant par - ou •
+        message = message.replace(/((?:^[-•]\s.*\n?)+)/gm, function(list) {
+            const items = list.trim().split('\n').map(line =>
+                line.replace(/^[-•]\s*/, '').trim()
+            ).filter(Boolean);
+            if (items.length === 0) return '';
+            return '<ul>' + items.map(item => `<li>${item}</li>`).join('') + '</ul>';
+        });
 
-        // Listes numérotées markdown
-        formatted = formatted.replace(/(^|\n)(\d+)\.\s+\*\*Page (\d+)\*\*\s*:\s*(.*?)(?=(\n\d+\.|\n\*\*|$))/gs,
-            (m, p1, num, page, content) =>
-                `<div class='doc-page-block'><span class='page-badge'>Page ${page}</span> <span class='page-content'>${content.trim()}</span></div>`
-        );
-        // Listes à puces markdown
-        formatted = formatted.replace(/(^|\n)-\s+\*\*Page (\d+)\*\*\s*:\s*(.*?)(?=(\n-|\n\*\*|$))/gs,
-            (m, p1, page, content) =>
-                `<div class='doc-page-block'><span class='page-badge'>Page ${page}</span> <span class='page-content'>${content.trim()}</span></div>`
-        );
-        // Listes à puces simples
-        formatted = formatted.replace(/(^|\n)-\s+(.*?)(?=(\n-|\n\*\*|$))/gs,
-            (m, p1, content) =>
-                `<div class='doc-list-item'>• ${content.trim()}</div>`
-        );
-        // Listes numérotées simples
-        formatted = formatted.replace(/(^|\n)(\d+)\.\s+(.*?)(?=(\n\d+\.|\n\*\*|$))/gs,
-            (m, p1, num, content) =>
-                `<div class='doc-list-item'>${num}. ${content.trim()}</div>`
-        );
-        // Citations avec >
-        formatted = formatted.replace(/^>\s*(.*?)$/gm, '<div class="quote-block">$1</div>');
-        // Headers en gras (hors titres de doc)
-        formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong class="section-header">$1</strong>');
-        // Emojis spéciaux
-        formatted = formatted.replace(/(📊|📈|💡|⚠️|✅|❌)/g, '<span class="emoji-highlight">$1</span>');
-        // Numéros de page isolés
-        formatted = formatted.replace(/\(Page (\d+)\)/g, '<span class="page-ref">(Page $1)</span>');
-        // Séparateurs de documents
-        formatted = formatted.replace(/(<div class='doc-title-block'>[^<]+<\/div>)/g, '<div class="doc-separator"></div>$1');
-        // Lignes vides pour les sections
-        formatted = formatted.replace(/\n\n/g, '<div class="section-break"></div>');
-        // Retours à la ligne simples
-        formatted = formatted.replace(/\n/g, '<br>');
+        // 3. Remplacer les listes numérotées markdown par <ol><li>...</li></ol>
+        message = message.replace(/((?:^\d+\.\s.*\n?)+)/gm, function(list) {
+            const items = list.trim().split('\n').map(line =>
+                line.replace(/^\d+\.\s*/, '').trim()
+            ).filter(Boolean);
+            if (items.length === 0) return '';
+            return '<ol>' + items.map(item => `<li>${item}</li>`).join('') + '</ol>';
+        });
 
-        return formatted;
+        // 4. Titres en gras sur une ligne seule
+        message = message.replace(/\*\*(.+?)\*\*/g, '<div class="doc-title-block">$1</div>');
+
+        // 5. Nettoyer les sauts de ligne multiples
+        message = message.replace(/\n{2,}/g, '<div class="section-break"></div>');
+        message = message.replace(/\n/g, '<br>');
+
+        // 6. Emojis spéciaux
+        message = message.replace(/(📊|📈|💡|⚠️|✅|❌)/g, '<span class="emoji-highlight">$1</span>');
+
+        // 7. Échapper le HTML restant pour éviter les injections
+        const div = document.createElement('div');
+        div.innerHTML = message;
+        return div.innerHTML;
     }
     
     escapeHtml(text) {
