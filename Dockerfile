@@ -14,7 +14,7 @@ RUN /app/venv/bin/pip install -r requirements.txt
 COPY . .
 
 # Exposer le port
-EXPOSE 5000
+EXPOSE 8080
 
-# Commande de démarrage
-CMD ["/app/venv/bin/python", "app.py"] 
+# Commande de démarrage avec Gunicorn
+CMD ["/app/venv/bin/gunicorn", "--bind", "0.0.0.0:8080", "--workers", "2", "--timeout", "120", "wsgi:app"] 
