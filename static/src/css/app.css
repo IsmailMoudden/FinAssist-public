@@ -1,3 +1,31 @@
+/* Ajout dark/light mode global */
+:root {
+  --blue: #76cfff;
+  --violet: #a97ff7;
+  --orange: #FF9900;
+  --orange-light: #FFB347;
+  --bg: #fff;
+  --text: #181818;
+  --input-border: #d0d0d0;
+  --input-focus: var(--orange);
+  --btn-bg: linear-gradient(90deg, var(--orange-light), var(--orange));
+  --btn-text: #fff;
+  --label-focus: var(--orange);
+}
+body.dark, .dark {
+  --bg: #181818;
+  --text: #fff;
+  --input-border: #444;
+  --input-focus: var(--orange-light);
+  --btn-bg: linear-gradient(90deg, var(--orange), var(--orange-light));
+  --btn-text: #fff;
+  --label-focus: var(--orange-light);
+}
+body, html {
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.3s, color 0.3s;
+}
 html, body, #split-container { height: 100%; min-height: 100vh; }
 .scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
 .scrollbar-hidden::-webkit-scrollbar { display: none; }

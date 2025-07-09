@@ -133,13 +133,21 @@ def ask():
 
 # Serve index.html at root
 @app.route('/')
-def serve_index():
-    return send_from_directory('static', 'index.html')
+def serve_landing():
+    return send_from_directory('static', 'landing.html')
 
 # Serve static files (JS, CSS, etc.)
 @app.route('/<path:path>')
 def serve_static(path):
     return send_from_directory('static', path)
+
+@app.route('/index')
+def serve_index():
+    return send_from_directory('static', 'index.html')
+
+@app.route('/old')
+def serve_old():
+    return send_from_directory('static', 'index.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5002) 
