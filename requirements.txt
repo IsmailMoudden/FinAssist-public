@@ -3,4 +3,7 @@ python-dotenv
 pytesseract
 Pillow
 requests
-PyPDF2 
+PyPDF2
+PyMuPDF
+opencv-python
+numpy 

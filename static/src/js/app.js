@@ -470,12 +470,13 @@ class FinAssistCopilot {
         message = message.replace(/^#+\s*$/gm, '');
         // Fusionne les ':' seuls avec le titre précédent (ex: '**Titre**\n:' -> '**Titre :**')
         message = message.replace(/(\*\*[^\*]+\*\*)\s*\n\s*:/g, '$1 :');
+        // Fusionne les titres en gras suivis de deux-points sur la même ligne (ex: '**Titre** :')
+        message = message.replace(/(\*\*[^\*]+\*\*)\s*:/g, '$1 :');
         // Supprime les lignes qui ne contiennent qu'un tiret ou une puce vide
         message = message.replace(/^\s*[-•]\s*$/gm, '');
         // Regroupe numéro + titre dans la même balise markdown pour un style cohérent
         message = message.replace(/(\d+)\.\s+\*\*([^\*]+)\*\*/g, '**$1. $2**');
         // Fusionne les numéros et titres sur une seule ligne (ex: 1.\nTitre -> 1. Titre)
-        // On ne touche que si le titre commence par une majuscule (robuste)
         let merged = message.replace(/(\d+)\.\s*\n([A-Z][A-Za-z0-9 \-']{2,})/g, (m, num, title) => `${num}. ${title.trim()}`);
         // Correction : fusionne les listes numérotées où le numéro, le titre et le range de pages sont sur des lignes séparées
         merged = merged.replace(/(\d+)\.\s*\n([A-Za-z0-9 \-']+)\s*\n\((Pages? [^\)]+)\):?\s*(.*?)(?=(\n\d+\.|$))/gs,
@@ -585,7 +586,9 @@ class FinAssistCopilot {
                 </div>
                 <div class="message-content ai-content">
                     <div class="message-text">
-                        <span class="animate-bounce" style="font-size:1.5em;">...</span>
+                        <span class="typing-dots">
+                          <span>.</span><span>.</span><span>.</span>
+                        </span>
                         <span style="margin-left:8px;">FinAssist is typing</span>
                     </div>
                 </div>

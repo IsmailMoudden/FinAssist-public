@@ -1,0 +1,152 @@
+{
+  "61081f0e22d70471b20804894959e286": {
+    "result": "Analyse du document financier :\n\n1. Type de contenu\n- Il s'agit d'un graphique \u00e0 barres vertical simple\n- Design minimaliste avec un titre \"Test Graphique\"\n- Utilisation de 4 barres de couleurs diff\u00e9rentes (corail, turquoise, bleu clair et vert menthe)\n\n2. Donn\u00e9es et m\u00e9triques\n- Le graphique pr\u00e9sente une progression croissante\n- 4 mesures distinctes sont repr\u00e9sent\u00e9es\n- Absence d'\u00e9chelle chiffr\u00e9e et de l\u00e9gende sur les axes\n- Les barres montrent une augmentation progressive de la hauteur\n\n3. Tendances et insights\n- Tendance clairement haussi\u00e8re\n- Progression r\u00e9guli\u00e8re et constante entre chaque barre\n- La derni\u00e8re valeur (verte) est environ 2,5 fois plus \u00e9lev\u00e9e que la premi\u00e8re (corail)\n\n4. Contexte financier\n- Sans \u00e9chelle ni labels pr\u00e9cis, il est difficile de d\u00e9terminer la nature exacte des donn\u00e9es\n- Pourrait repr\u00e9senter une \u00e9volution de performances financi\u00e8res (chiffre d'affaires, b\u00e9n\u00e9fices, etc.)\n- Le format sugg\u00e8re une analyse temporelle (possiblement trimestrielle ou annuelle)\n\nNote : Pour une analyse plus pr\u00e9cise, il serait utile d'avoir des informations compl\u00e9mentaires comme les unit\u00e9s de mesure, les p\u00e9riodes concern\u00e9es et la nature exacte des donn\u00e9es repr\u00e9sent\u00e9es.",
+    "timestamp": 1752066546.0080159,
+    "size": 6573
+  },
+  "407c3db78908025aacb571cf9d9dc037": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070744.049942,
+    "size": 10970
+  },
+  "c371d4d5bab5800560758f275d92fc90": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070747.544567,
+    "size": 3422
+  },
+  "8ea652180e508544da1579ef2d51a648": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070751.092949,
+    "size": 24642
+  },
+  "aef100e660399f92ce783b668159aa39": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070754.825053,
+    "size": 88410
+  },
+  "f614a8e7b663f7cd57e7d8cb7e641ac9": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070758.4225621,
+    "size": 32530
+  },
+  "c6b1fa8b3e5e762f2be5ef627e85a614": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070761.90236,
+    "size": 27841
+  },
+  "45973c8270c2532216914da840761031": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070869.12165,
+    "size": 36946
+  },
+  "aa257b5131f6765db397c4edd6d0e853": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070872.73067,
+    "size": 10432
+  },
+  "4f8fd8f21f7f4564c9956568cab584f9": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070876.264458,
+    "size": 12456
+  },
+  "1e7a4782fe320f884f5ccd09ca5794dd": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070879.884127,
+    "size": 14010
+  },
+  "351fa0ae06bae080175d46617b521b0b": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070883.3659708,
+    "size": 8833
+  },
+  "4551cef761167849f4c54af89331b3c4": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070886.913167,
+    "size": 5394
+  },
+  "42c49eb5d5a618e60da80a4b30527fdd": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070890.450099,
+    "size": 3772
+  },
+  "f51c0bedc1bd868c856335b759b86ec9": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070894.0386822,
+    "size": 10489
+  },
+  "6c905e75c1016540ad987d1ee8a2a5f2": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070897.59826,
+    "size": 14410
+  },
+  "b765dcbe7bac74a7f155dd7eb7543bf6": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070901.228095,
+    "size": 14448
+  },
+  "7e288de908031fc4b70ca44978e8e825": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070904.7961779,
+    "size": 11854
+  },
+  "b296249c956db5fb1b06d5e7ef69f44c": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070908.3950589,
+    "size": 7987
+  },
+  "7e27061721bdc0892ed6e79abdf982f0": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070912.0932648,
+    "size": 20587
+  },
+  "c6b3cf23c23d76715de5a747542faff0": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070915.6855,
+    "size": 5631
+  },
+  "f7f995630c689bbb7c821787eddd59ef": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070919.271092,
+    "size": 23409
+  },
+  "dc0f7a69dd0650dc60a26a8e939dd242": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070922.785517,
+    "size": 4490
+  },
+  "a1b62e63ad3bca2c7406137d56266872": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070926.273196,
+    "size": 15445
+  },
+  "601e938512494b2781cc6a225e5f2ce7": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070929.760798,
+    "size": 14654
+  },
+  "8acc7633246804098eb2a2fa66994b5a": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070933.2996202,
+    "size": 13116
+  },
+  "333b5182c8159d1fd41915d15c390f70": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070936.8267488,
+    "size": 15023
+  },
+  "34b208bd833c074e3160fe4f1c747a04": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070940.358391,
+    "size": 11324
+  },
+  "6742a6527f187b95630d9a6a256e2ba6": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070943.894327,
+    "size": 12561
+  },
+  "d385751a712b4b8cf95c55ff277bb892": {
+    "result": "\u274c Erreur API apr\u00e8s 3 tentatives: {\"error\":{\"message\":\"No auth credentials found\",\"code\":401}}",
+    "timestamp": 1752070947.4859881,
+    "size": 17756
+  }
+}
