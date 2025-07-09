@@ -171,8 +171,19 @@ def health_check():
         'version': '1.0.0'
     })
 
+@app.route('/test')
+def test():
+    return jsonify({
+        'message': 'FinAssist is running!',
+        'timestamp': time.time()
+    })
+
+# Configuration pour Gunicorn
+app.config['ENV'] = 'production'
+app.config['DEBUG'] = False
+
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5002))
+    port = int(os.environ.get('PORT', 8080))
     debug = os.environ.get('FLASK_ENV') == 'development'
     print(f"🚀 Démarrage FinAssist sur le port {port}")
     print(f"🔧 Mode debug: {debug}")
