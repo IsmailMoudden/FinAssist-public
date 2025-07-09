@@ -22,7 +22,13 @@ html, body, #split-container { height: 100%; min-height: 100vh; }
 .page-container { position: relative; }
 .textLayer { position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; opacity: 1; }
 .textLayer ::selection { background: rgba(255, 179, 71, 0.3); }
-.textLayer > span { color: transparent; position: absolute; white-space: pre; cursor: text; transform-origin: 0% 0%; }
+.textLayer > span {
+  color: transparent !important;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+}
 @media (max-width: 900px) {
     #split-container { flex-direction: column !important; }
     #sidebar-left, #sidebar-right, #viewer-main { min-width: 0 !important; width: 100% !important; }
@@ -180,10 +186,13 @@ html, body, #split-container { height: 100%; min-height: 100vh; }
 }
 #documents-list > div .doc-title {
   font-weight: 600;
-  color: #fff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #ff9900 !important;
+}
+.dark #documents-list > div .doc-title {
+  color: #fff !important;
 }
 #documents-list > div .doc-emoji {
   font-size: 1.5em;
@@ -238,10 +247,15 @@ html, body, #split-container { height: 100%; min-height: 100vh; }
 }
 /* Remove orange text for static, use white/gray */
 .bg-orange-gradient.bg-clip-text.text-transparent {
-  color: #f7f7f7 !important;
+  color: #ff9900 !important;
   background: none !important;
   -webkit-background-clip: unset !important;
-  -webkit-text-fill-color: #f7f7f7 !important;
+  -webkit-text-fill-color: #ff9900 !important;
+}
+.doc-title-block,
+.section-header,
+.quote-block {
+  color: #ff9900;
 }
 /* Chat Messages Styling */
 .user-message {
@@ -256,25 +270,56 @@ html, body, #split-container { height: 100%; min-height: 100vh; }
   margin-bottom: 16px;
 }
 
+.message-row {
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 16px;
+}
+.user-row {
+  flex-direction: row;
+  justify-content: flex-end;
+}
+.user-avatar {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  margin-right: 0;
+  height: 100%;
+}
+.user-avatar-svg {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+.ai-row {
+  flex-direction: row;
+  justify-content: flex-start;
+}
+.ai-avatar {
+  margin-right: 10px;
+  margin-left: 0;
+}
 .message-content {
   max-width: 85%;
   padding: 12px 16px;
   border-radius: 18px;
   position: relative;
   line-height: 1.5;
+  display: flex;
+  align-items: center;
 }
 
 .user-content {
   background: linear-gradient(135deg, #ffbb33 0%, #ffaa00 100%);
-  color: #fff;
+  color: #222;
   border-bottom-right-radius: 6px;
   box-shadow: 0 2px 8px rgba(255, 187, 51, 0.3);
 }
 
 .ai-content {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.7);
   border: 1px solid rgba(255, 187, 51, 0.2);
-  color: #f0f0f0;
+  color: #222;
   border-bottom-left-radius: 6px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }
@@ -431,12 +476,31 @@ html, body, #split-container { height: 100%; min-height: 100vh; }
 }
 .page-content {
   flex: 1 1 auto;
-  color: #f0f0f0;
+  color: #222;
 }
 .doc-list-item {
   margin-left: 22px;
   margin-bottom: 3px;
-  color: #f0f0f0;
+  color: #222;
   font-size: 0.98em;
   line-height: 1.5;
+} 
+.dark .user-content {
+  color: #fff;
+}
+.dark .ai-content {
+  color: #f0f0f0;
+  background: rgba(255, 255, 255, 0.1);
+}
+.dark .page-content {
+  color: #f0f0f0;
+}
+.dark .doc-list-item {
+  color: #f0f0f0;
+} 
+.doc-title {
+  color: #ff9900;
+}
+.dark .doc-title {
+  color: #fff;
 } 

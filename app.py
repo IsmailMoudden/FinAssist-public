@@ -5,6 +5,7 @@ from utils.vision import describe_image
 from utils.pdf import extract_pdf_text_and_pages
 import requests
 from dotenv import load_dotenv
+import re
 
 load_dotenv()
 OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
@@ -12,9 +13,11 @@ OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
 SYSTEM_PROMPT = (
     "Tu es un assistant expert en analyse de documents financiers (fonds, private credit, BDC, etc.), mais tu sais aussi traiter d’autres types de documents.\n"
     "\n"
-    "Ton style doit être engageant, clair, synthétique et très professionnel, tout en restant accessible.\n"
+    "Ta mission est de fournir des réponses techniques, précises et expertes, adaptées à un public de professionnels ou d'experts en finance.\n"
+    "N’hésite pas à utiliser un vocabulaire financier avancé, à détailler les concepts, à expliciter les mécanismes, et à fournir des analyses pointues.\n"
     "\n"
     "Ta priorité est de répondre précisément à la question posée par l’utilisateur, en t’appuyant uniquement sur le contenu fourni.\n"
+    "Si possible, cite directement le texte du document pour appuyer ta réponse, en indiquant la page si pertinent.\n"
     "\n"
     "Pour t’aider à extraire les informations pertinentes dans les documents de type fonds ou présentation financière, tu peux t’appuyer sur les catégories suivantes si elles sont utiles à la question :\n"
     "  1. Structure et métadonnées du fonds (nom, type, date, véhicule, juridiction, minimum d’investissement)\n"
@@ -52,6 +55,7 @@ def ask():
         return jsonify({'error': 'Missing files or question'}), 400
 
     all_contents = []
+    all_pages = []
     for file in files:
         filename = file.filename.lower()
         content = ""
@@ -61,6 +65,7 @@ def ask():
                 for p in pages:
                     if p['text']:
                         content += f"\n[Page {p['page']}]\n{p['text']}"
+                        all_pages.append({'page': p['page'], 'text': p['text']})
             except Exception as e:
                 content += f"\n[PDF extraction error: {e}]"
         elif filename.endswith(('.png', '.jpg', '.jpeg', '.bmp', '.tiff')):
@@ -76,10 +81,32 @@ def ask():
         all_contents.append(content)
 
     full_text = "\n---\n".join(all_contents)
-    user_prompt = f"Voici le contenu des documents :\n{full_text}\n\nQuestion : {question}"
+
+    # Nouvelle logique : question sur une page précise ?
+    page_match = re.search(r'page[s]?\s*(\d+)', question, re.IGNORECASE)
+    if page_match and all_pages:
+        page_num = int(page_match.group(1))
+        page_text = next((p['text'] for p in all_pages if p['page'] == page_num), None)
+        # Sommaire des pages pour contexte
+        page_summaries = []
+        for p in all_pages:
+            summary = p['text'][:120].replace('\n', ' ').replace('\r', ' ')
+            page_summaries.append(f"Page {p['page']}: {summary}...")
+        summary_text = "\n".join(page_summaries)
+        if page_text:
+            preview = page_text[:300].replace('\n', ' ').replace('\r', ' ')
+            user_prompt = (
+                f"Voici le sommaire des pages du document :\n{summary_text}\n\n"
+                f"Aperçu du texte extrait pour la page {page_num} :\n{preview}\n\n"
+                f"Voici le texte complet de la page {page_num} :\n{page_text}\n\n"
+                f"Question : {question}"
+            )
+        else:
+            user_prompt = f"La page {page_num} n'a pas été trouvée dans le document.\n\nQuestion : {question}"
+    else:
+        user_prompt = f"Voici le contenu des documents :\n{full_text}\n\nQuestion : {question}"
 
     # DEBUG: Affiche le contenu envoyé au modèle
-    print("FULL_TEXT:\n", full_text)
 
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",

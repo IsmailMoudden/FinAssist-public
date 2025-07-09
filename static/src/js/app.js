@@ -6,20 +6,17 @@ import { savePDF, getPDF, getAllPDFs, deletePDF } from './idb.js';
 
 class FinAssistCopilot {
     constructor() {
-        this.documents = [
-            { id: 'financial-analysis', name: 'Financial Analysis Guide', filename: 'static/financial-analysis.pdf' },
-            { id: 'business-plan', name: 'Business Plan Template', filename: 'static/business-plan.pdf' },
-            { id: 'market-research', name: 'Market Research Report', filename: 'static/market-research.pdf' },
-            { id: 'investment-strategy', name: 'Investment Strategy Overview', filename: 'static/investment-strategy.pdf' }
-        ];
-        
+        this.documents = [];
         this.currentDocument = null;
         this.currentPdf = null;
         this.currentScaleMultiplier = 1.0;
         this.zoomStep = 0.2;
         this.split = null;
         this.contextDocs = [];
-        
+        this.pagesRendered = 0; // <--- Ajouté pour le rendu progressif
+        this.pagesPerBatch = 2; // <--- Nombre de pages à charger à chaque scroll
+        this.initialPages = 3; // <--- Nombre de pages au début
+        this.isRendering = false; // <--- Pour éviter les doubles chargements
         this.init();
     }
     
@@ -98,14 +95,14 @@ class FinAssistCopilot {
             this.addChatMessage('user', message);
             chatTextarea.value = '';
 
-            // Afficher "FinAssist is typing..."
-            if (typingIndicator) typingIndicator.classList.remove('hidden');
+            // Ajoute l'indicateur "FinAssist is typing..." en bas du chat
+            this.addTypingIndicator();
 
             // Utiliser la vraie variable contextDocs du scope global
             // (et non window.contextDocs)
             if (!Array.isArray(this.contextDocs) || this.contextDocs.length === 0) {
+                this.removeTypingIndicator();
                 this.addChatMessage('ai', '❌ Please add at least one document to the context (drag a document into the chat bar).');
-                if (typingIndicator) typingIndicator.classList.add('hidden');
                 return;
             }
 
@@ -124,7 +121,7 @@ class FinAssistCopilot {
                         formData.append('files', fileToSend, doc.name);
                         hasValidFile = true;
                     } else {
-                        // Doc local mais plus de _file (après refresh)
+                        this.removeTypingIndicator();
                         this.addChatMessage('ai', `❌ The local file "${doc.name}" is not available anymore. Please re-upload it.`);
                     }
                 } else if (doc.filename) {
@@ -138,12 +135,13 @@ class FinAssistCopilot {
                         formData.append('files', blob, fileName);
                         hasValidFile = true;
                     } catch (e) {
+                        this.removeTypingIndicator();
                         this.addChatMessage('ai', `❌ Could not fetch static document "${doc.name}".`);
                     }
                 }
             }
             if (!hasValidFile) {
-                if (typingIndicator) typingIndicator.classList.add('hidden');
+                this.removeTypingIndicator();
                 return;
             }
             // Appel au backend
@@ -152,6 +150,7 @@ class FinAssistCopilot {
                     method: 'POST',
                     body: formData
                 });
+                this.removeTypingIndicator();
                 if (!resp.ok) {
                     const data = await resp.json().catch(() => ({}));
                     this.addChatMessage('ai', `❌ Error: ${data.error || 'Server error.'}`);
@@ -160,9 +159,9 @@ class FinAssistCopilot {
                     this.addChatMessage('ai', data.answer || 'No answer received.');
                 }
             } catch (err) {
+                this.removeTypingIndicator();
                 this.addChatMessage('ai', `❌ Network error: ${err}`);
             }
-            if (typingIndicator) typingIndicator.classList.add('hidden');
         };
 
         if (sendButton) sendButton.addEventListener('click', sendMessage);
@@ -205,6 +204,10 @@ class FinAssistCopilot {
         for (const file of files) {
             if (file.type !== 'application/pdf') {
                 this.showError('Veuillez sélectionner uniquement des fichiers PDF.');
+                continue;
+            }
+            if (file.size > 20 * 1024 * 1024) { // 20 Mo
+                this.showError('Le fichier est trop volumineux (max 20 Mo).');
                 continue;
             }
             const id = `local-${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
@@ -251,15 +254,15 @@ class FinAssistCopilot {
             this.showError('Local file not available after refresh.');
             return;
         }
-        if (this.currentDocument && this.currentDocument.isLocal) {
-            URL.revokeObjectURL(this.currentDocument.filename);
-        }
         this.currentDocument = doc;
         this.showLoading(true);
         this.hideWelcomeMessage();
         // Reset state for new document
         this.currentPdf = null;
         this.currentScaleMultiplier = 1.0;
+        this.pagesRendered = 0; // <--- Reset du compteur de pages
+        const pdfPagesContainer = document.getElementById('pdf-pages');
+        if (pdfPagesContainer) pdfPagesContainer.innerHTML = '';
         document.getElementById('zoom-controls').classList.add('hidden');
         try {
             await this.loadRealPDF(doc);
@@ -273,13 +276,19 @@ class FinAssistCopilot {
     }
     
     async loadRealPDF(doc) {
-        const loadingTask = pdfjsLib.getDocument(doc.filename);
-        const pdf = await loadingTask.promise;
-        this.currentPdf = pdf;
-        
-        await this.renderAllPages();
-        
-        this.addChatMessage('ai', `📊 Document loaded! I can help you analyze this ${doc.name.toLowerCase()}. Ask me about key insights, financial metrics, or business implications.`);
+        try {
+            const loadingTask = pdfjsLib.getDocument(doc.filename);
+            const pdf = await loadingTask.promise;
+            this.currentPdf = pdf;
+            this.pagesRendered = 0; // <--- Reset ici aussi
+            await this.renderNextPages(this.initialPages); // <--- Charge les 3 premières pages
+            this.setupScrollLoading(); // <--- Ajoute l'écouteur de scroll
+            this.addChatMessage('ai', `📊 Document loaded! I can help you analyze this ${doc.name.toLowerCase()}. Ask me about key insights, financial metrics, or business implications.`);
+        } catch (e) {
+            this.displayErrorInViewer('Could not load the PDF document. Please check the file path and the console for errors.');
+            this.showError('Error loading document.');
+            this.showLoading(false);
+        }
     }
 
     async renderAllPages() {
@@ -291,7 +300,7 @@ class FinAssistCopilot {
         pdfPagesContainer.innerHTML = '';
         this.showLoading(true);
         const fragment = document.createDocumentFragment();
-        for (let pageNum = 1; pageNum <= this.currentPdf.numPages; pageNum++) {
+        for (let pageNum = 1; pageNum <= Math.min(this.currentPdf.numPages, 5); pageNum++) {
             const page = await this.currentPdf.getPage(pageNum);
             const originalViewport = page.getViewport({ scale: 1.0 });
             const fitScale = containerWidth / originalViewport.width;
@@ -330,6 +339,77 @@ class FinAssistCopilot {
         this.showLoading(false);
     }
     
+    async renderNextPages(count) {
+        if (!this.currentPdf || this.isRendering) return;
+        this.isRendering = true;
+        const pdfPagesContainer = document.getElementById('pdf-pages');
+        const container = document.getElementById('pdf-container');
+        const containerWidth = container.clientWidth - 32;
+        const dpr = window.devicePixelRatio || 1;
+        const fragment = document.createDocumentFragment();
+        const start = this.pagesRendered + 1;
+        const end = Math.min(this.currentPdf.numPages, this.pagesRendered + count);
+        for (let pageNum = start; pageNum <= end; pageNum++) {
+            const page = await this.currentPdf.getPage(pageNum);
+            const originalViewport = page.getViewport({ scale: 1.0 });
+            const fitScale = containerWidth / originalViewport.width;
+            const finalScale = fitScale * this.currentScaleMultiplier * dpr;
+            const viewport = page.getViewport({ scale: finalScale });
+            const pageContainer = document.createElement('div');
+            pageContainer.className = 'page-container card-3d';
+            pageContainer.style.width = `${viewport.width / dpr}px`;
+            pageContainer.style.height = `${viewport.height / dpr}px`;
+            const canvas = document.createElement('canvas');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            canvas.style.width = `${viewport.width / dpr}px`;
+            canvas.style.height = `${viewport.height / dpr}px`;
+            pageContainer.appendChild(canvas);
+            const textLayerDiv = document.createElement('div');
+            textLayerDiv.className = 'textLayer';
+            textLayerDiv.style.setProperty('--scale-factor', finalScale);
+            pageContainer.appendChild(textLayerDiv);
+            fragment.appendChild(pageContainer);
+            // Render canvas and text layer
+            page.render({
+                canvasContext: canvas.getContext('2d'),
+                viewport: viewport
+            });
+            page.getTextContent().then(textContent => {
+                pdfjsLib.renderTextLayer({
+                    textContentSource: textContent,
+                    container: textLayerDiv,
+                    viewport: viewport,
+                });
+            });
+        }
+        pdfPagesContainer.appendChild(fragment);
+        this.pagesRendered = end;
+        this.updateZoomLevelText();
+        this.isRendering = false;
+        this.showLoading(false);
+    }
+
+    setupScrollLoading() {
+        const container = document.getElementById('pdf-container');
+        if (!container) return;
+        // Supprime les anciens écouteurs si besoin
+        if (this._scrollHandler) {
+            container.removeEventListener('scroll', this._scrollHandler);
+        }
+        this._scrollHandler = async () => {
+            if (!this.currentPdf) return;
+            // Si déjà en train de charger ou tout est chargé, on ne fait rien
+            if (this.isRendering || this.pagesRendered >= this.currentPdf.numPages) return;
+            // Si on est proche du bas (100px)
+            if (container.scrollTop + container.clientHeight >= container.scrollHeight - 100) {
+                this.showLoading(true);
+                await this.renderNextPages(this.pagesPerBatch);
+            }
+        };
+        container.addEventListener('scroll', this._scrollHandler);
+    }
+    
     displayErrorInViewer(message) {
         const pdfPagesContainer = document.getElementById('pdf-pages');
         pdfPagesContainer.innerHTML = `
@@ -345,35 +425,60 @@ class FinAssistCopilot {
         const chatMessages = document.getElementById('chat-messages');
         const messageElement = document.createElement('div');
         const isUser = sender === 'user';
-        
         messageElement.className = `message-appear ${isUser ? 'user-message' : 'ai-message'}`;
-        
         if (isUser) {
-            // Message utilisateur simple
+            // Avatar SVG orange, légèrement plus bas
             messageElement.innerHTML = `
-                <div class="message-content user-content">
-                    <div class="message-avatar">👤</div>
-                    <div class="message-text">${this.escapeHtml(message)}</div>
+                <div class="message-row user-row">
+                    <div class="message-content user-content">
+                        <div class="message-text">${this.escapeHtml(message)}</div>
+                    </div>
+                    <div class="message-avatar user-avatar">
+                        <svg class="user-avatar-svg" width="32" height="32" viewBox="0 0 32 32" fill="none" style="display:block; position:relative; top:6px;">
+                          <circle cx="16" cy="12" r="6" fill="#FFF3E0" stroke="#FF9900" stroke-width="2"/>
+                          <ellipse cx="16" cy="24" rx="9" ry="5" fill="none" stroke="#FF9900" stroke-width="2"/>
+                        </svg>
+                    </div>
                 </div>
             `;
         } else {
-            // Message AI avec structure
+            // Avatar robot SVG minimaliste à gauche, bulle à droite
             const formattedMessage = this.formatAIResponse(message);
             messageElement.innerHTML = `
-                <div class="message-content ai-content">
-                    <div class="message-avatar">🤖</div>
-                    <div class="message-text">${formattedMessage}</div>
+                <div class="message-row ai-row">
+                    <div class="message-avatar ai-avatar">
+                        <svg class="ai-avatar-svg" width="32" height="32" viewBox="0 0 32 32" fill="none" style="display:block; position:relative; top:6px;">
+                          <rect x="7" y="13" width="18" height="12" rx="6" fill="#FFF3E0" stroke="#FF9900" stroke-width="2"/>
+                          <circle cx="13" cy="19" r="2" fill="#FF9900"/>
+                          <circle cx="19" cy="19" r="2" fill="#FF9900"/>
+                          <rect x="12" y="25" width="8" height="2" rx="1" fill="#FF9900"/>
+                          <rect x="14.5" y="9" width="3" height="4" rx="1.5" fill="#FF9900"/>
+                        </svg>
+                    </div>
+                    <div class="message-content ai-content">
+                        <div class="message-text">${formattedMessage}</div>
+                    </div>
                 </div>
             `;
         }
-        
         chatMessages.appendChild(messageElement);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
     
     formatAIResponse(message) {
+        // Supprime toutes les lignes qui ne contiennent que des # (titres markdown inutiles)
+        message = message.replace(/^#+\s*$/gm, '');
+        // Fusionne les ':' seuls avec le titre précédent (ex: '**Titre**\n:' -> '**Titre :**')
+        message = message.replace(/(\*\*[^\*]+\*\*)\s*\n\s*:/g, '$1 :');
+        // Supprime les lignes qui ne contiennent qu'un tiret ou une puce vide
+        message = message.replace(/^\s*[-•]\s*$/gm, '');
+        // Regroupe numéro + titre dans la même balise markdown pour un style cohérent
+        message = message.replace(/(\d+)\.\s+\*\*([^\*]+)\*\*/g, '**$1. $2**');
+        // Fusionne les numéros et titres sur une seule ligne (ex: 1.\nTitre -> 1. Titre)
+        // On ne touche que si le titre commence par une majuscule (robuste)
+        let merged = message.replace(/(\d+)\.\s*\n([A-Z][A-Za-z0-9 \-']{2,})/g, (m, num, title) => `${num}. ${title.trim()}`);
         // Correction : fusionne les listes numérotées où le numéro, le titre et le range de pages sont sur des lignes séparées
-        let merged = message.replace(/(\d+)\.\s*\n([A-Za-z0-9 \-']+)\s*\n\((Pages? [^\)]+)\):?\s*(.*?)(?=(\n\d+\.|$))/gs,
+        merged = merged.replace(/(\d+)\.\s*\n([A-Za-z0-9 \-']+)\s*\n\((Pages? [^\)]+)\):?\s*(.*?)(?=(\n\d+\.|$))/gs,
             (m, num, title, pages, rest) => `${num}. **${title.trim()} (${pages.trim()}):** ${rest.trim()}`
         );
         // Échapper le HTML pour éviter les injections
@@ -459,6 +564,41 @@ class FinAssistCopilot {
         }
         this.documents.splice(idx, 1);
         this.renderDocumentsList();
+    }
+
+    addTypingIndicator() {
+        const chatMessages = document.getElementById('chat-messages');
+        // Ne pas ajouter plusieurs indicateurs
+        if (chatMessages.querySelector('.ai-typing-indicator')) return;
+        const typingElement = document.createElement('div');
+        typingElement.className = 'message-appear ai-message ai-typing-indicator';
+        typingElement.innerHTML = `
+            <div class="message-row ai-row">
+                <div class="message-avatar ai-avatar">
+                    <svg class="ai-avatar-svg" width="32" height="32" viewBox="0 0 32 32" fill="none" style="display:block; position:relative; top:6px;">
+                      <rect x="7" y="13" width="18" height="12" rx="6" fill="#FFF3E0" stroke="#FF9900" stroke-width="2"/>
+                      <circle cx="13" cy="19" r="2" fill="#FF9900"/>
+                      <circle cx="19" cy="19" r="2" fill="#FF9900"/>
+                      <rect x="12" y="25" width="8" height="2" rx="1" fill="#FF9900"/>
+                      <rect x="14.5" y="9" width="3" height="4" rx="1.5" fill="#FF9900"/>
+                    </svg>
+                </div>
+                <div class="message-content ai-content">
+                    <div class="message-text">
+                        <span class="animate-bounce" style="font-size:1.5em;">...</span>
+                        <span style="margin-left:8px;">FinAssist is typing</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        chatMessages.appendChild(typingElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    removeTypingIndicator() {
+        const chatMessages = document.getElementById('chat-messages');
+        const typing = chatMessages.querySelector('.ai-typing-indicator');
+        if (typing) typing.remove();
     }
 }
 
@@ -575,7 +715,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- 4. Affichage des badges ---
+    // --- 4. Affichage des badges ---x
     function renderBadges() {
         const docs = window.finAssistInstance && window.finAssistInstance.contextDocs || [];
         badgeZone.innerHTML = docs.map((doc, i) =>
