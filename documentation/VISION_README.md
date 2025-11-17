@@ -27,7 +27,7 @@ The FinAssist Vision capability analyzes images, charts, and tables embedded in 
 
 ### 1. Dependencies
 ```bash
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 ```
 
 ### 2. Environment
@@ -38,7 +38,7 @@ OPENROUTER_API_KEY=your_api_key_here
 
 ### 3. Tests
 ```bash
-python test_vision.py
+python backend/tests/test_vision.py
 ```
 
 ## Usage
@@ -221,7 +221,7 @@ API_TIMEOUT = 30
 
 ### Full Test Script
 ```bash
-python test_vision.py
+python backend/tests/test_vision.py
 ```
 
 ### Covered Scenarios

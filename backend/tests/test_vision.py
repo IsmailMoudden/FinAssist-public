@@ -6,10 +6,17 @@ Script de test pour la fonctionnalité Vision de FinAssist
 import os
 import sys
 import time
+from pathlib import Path
 from dotenv import load_dotenv
 
-# Ajouter le répertoire courant au path
-sys.path.append('.')
+CURRENT_DIR = Path(__file__).resolve().parent
+BACKEND_DIR = CURRENT_DIR.parent
+ROOT_DIR = CURRENT_DIR.parent.parent
+STATIC_DIR = ROOT_DIR / "static"
+
+# Assurer que backend et la racine sont dans le PYTHONPATH
+sys.path.insert(0, str(BACKEND_DIR))
+sys.path.insert(0, str(ROOT_DIR))
 
 load_dotenv()
 
@@ -69,7 +76,7 @@ def test_pdf_extraction():
         from utils.pdf import extract_pdf_text_images_and_pages
         
         # Vérifier si un PDF de test existe
-        test_pdf_path = "static/financial-analysis.pdf"
+        test_pdf_path = STATIC_DIR / "financial-analysis.pdf"
         if os.path.exists(test_pdf_path):
             with open(test_pdf_path, 'rb') as f:
                 pdf_bytes = f.read()

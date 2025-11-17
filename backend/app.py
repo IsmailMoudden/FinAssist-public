@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from flask import Flask, request, jsonify, send_from_directory
 from utils.ocr import ocr_image
 from utils.pdf import extract_pdf_text_and_pages
@@ -7,7 +8,10 @@ from dotenv import load_dotenv
 import re
 import time
 
-load_dotenv()
+BASE_DIR = Path(__file__).resolve().parent.parent
+STATIC_DIR = BASE_DIR / 'static'
+
+load_dotenv(BASE_DIR / '.env')
 OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
 MAX_TOKENS_PER_REQUEST = int(os.getenv('MAX_TOKENS_PER_REQUEST', '300'))
 RATE_LIMIT_CONTACT = os.getenv('RATE_LIMIT_CONTACT', 'ismail.moudden1@gmail.com')
@@ -196,19 +200,19 @@ def ask():
 
 @app.route('/')
 def serve_landing():
-    return send_from_directory('static', 'landing.html')
+    return send_from_directory(str(STATIC_DIR), 'landing.html')
 
 @app.route('/<path:path>')
 def serve_static(path):
-    return send_from_directory('static', path)
+    return send_from_directory(str(STATIC_DIR), path)
 
 @app.route('/index')
 def serve_index():
-    return send_from_directory('static', 'index.html')
+    return send_from_directory(str(STATIC_DIR), 'index.html')
 
 @app.route('/old')
 def serve_old():
-    return send_from_directory('static', 'index.html')
+    return send_from_directory(str(STATIC_DIR), 'index.html')
 
 @app.route('/health')
 def health_check():

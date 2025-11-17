@@ -163,7 +163,7 @@ Chart 2 (page 5):
 
 #### Test Script
 ```bash
-python test_vision.py
+python backend/tests/test_vision.py
 ```
 
 #### Covered Scenarios

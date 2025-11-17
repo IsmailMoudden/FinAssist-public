@@ -18,7 +18,7 @@ FinAssist Copilot is a dark-themed assistant that helps analysts browse financia
 - **Backend**: Flask application in `app.py` with supporting utilities under `utils/` for OCR, PDF parsing, and image analysis.
 - **Vision services**: `utils/vision.py` orchestrates OpenRouter calls, caching, and error handling for chart/table understanding.
 - **Persistence**: IndexedDB helper (`static/src/js/idb.js`) keeps uploaded PDFs available offline.
-- **Tests**: `test_vision.py` and `test_vision_api.py` validate the computer-vision workflow and API surface.
+- **Tests**: `backend/tests/test_vision.py` and `backend/tests/test_vision_api.py` validate the computer-vision workflow and API surface.
 
 Detailed explanations for each module live inside the `documentation/` directory. Start with `documentation/README.md` for the table of contents.
 
@@ -38,11 +38,11 @@ Navigate to `http://localhost:8000` after the server starts.
 
 ### 2. Run the Flask API (optional, for OCR/Vision endpoints)
 ```bash
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 cp .env.example .env   # fill in OPENROUTER_API_KEY before running
-python app.py
+python backend/app.py
 # or
-flask run --host=0.0.0.0 --port=5002
+FLASK_APP=backend.app flask run --host=0.0.0.0 --port=5002
 ```
 
 ### 3. Add Your Own PDFs
@@ -54,7 +54,14 @@ flask run --host=0.0.0.0 --port=5002
 
 ```
 FinAssist/
-├── app.py                     # Flask entry point
+├── backend/
+│   ├── app.py                 # Flask entry point
+│   ├── wsgi.py                # Gunicorn entry point
+│   ├── requirements.txt       # Backend dependencies
+│   ├── runtime.txt            # Runtime pin for PaaS targets
+│   ├── utils/                 # OCR, PDF, and vision helpers
+│   ├── tests/                 # Backend test suite
+│   └── vision_cache.json      # Vision cache store
 ├── documentation/             # Technical documentation set
 ├── static/
 │   ├── index.html             # Main interface
@@ -65,14 +72,13 @@ FinAssist/
 │           ├── app.js
 │           ├── idb.js
 │           └── landing.js
-├── utils/
-│   ├── ocr.py
-│   ├── pdf.py
-│   └── vision.py
-├── requirements.txt
-├── runtime.txt
-├── Procfile
-└── README.md
+├── Procfile                   # Gunicorn command (root for PaaS)
+├── Dockerfile                 # Container build (targets backend/)
+├── requirements.txt           # Proxy to backend/requirements.txt
+├── runtime.txt                # Python runtime pin for PaaS
+├── .python-version            # Pyenv pin for local dev
+├── README.md
+└── LICENSE
 ```
 
 ## Technology Stack
@@ -104,4 +110,7 @@ For deeper dives into each layer—OCR, PDF extraction, IndexedDB storage, CSS s
 - **Chat panel remains inactive**: ensure `static/src/js/app.js` is loaded and the Flask API (when used) returns a 200 response.
 - **Vision requests time out**: review `vision_cache.json`, check network access to OpenRouter, and verify the `OPENROUTER_API_KEY` value.
 
+## Licensing and Contributions
+
+FinAssist Copilot is distributed under the Creative Commons Attribution-NonCommercial 4.0 International license. You may reuse and adapt the project for non-commercial work as long as you credit the FinAssist Team and link back to this repository. For commercial licensing or redistribution that removes the FinAssist branding, contact `ismail.moudden1@gmail.com`.
 

@@ -158,8 +158,8 @@ REQUEST_TIMEOUT=30
 
 ### Test Scripts
 ```bash
-python test_vision.py
-python test_vision_api.py
+python backend/tests/test_vision.py
+python backend/tests/test_vision_api.py
 ```
 
 ### Test Coverage

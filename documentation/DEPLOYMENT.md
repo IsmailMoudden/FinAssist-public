@@ -20,10 +20,10 @@ PORT=5002
 
 ### 2. Project Files
 
-- `Procfile`: `web: python app.py`
+- `Procfile`: `web: gunicorn --chdir backend --bind 0.0.0.0:$PORT --workers 2 --timeout 120 wsgi:app`
 - `runtime.txt`: `python-3.12.0`
 - `railway.json`: Railway configuration
-- `requirements.txt`: Python dependencies
+- `requirements.txt`: proxy that points to `backend/requirements.txt`
 
 ## Deployment
 
@@ -116,7 +116,7 @@ lsof -ti:5002 | xargs kill -9
 #### 2. Missing Dependencies
 ```bash
 # Ensure requirements are installed
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 
 # Manually install if needed
 pip install PyMuPDF opencv-python numpy

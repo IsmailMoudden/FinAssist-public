@@ -4,6 +4,7 @@ import hashlib
 import json
 import time
 import os
+from pathlib import Path
 from PIL import Image
 import io
 from functools import lru_cache
@@ -11,7 +12,8 @@ from typing import Dict, List, Optional
 
 # Configuration
 OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
-VISION_CACHE_FILE = 'vision_cache.json'
+BASE_DIR = Path(__file__).resolve().parent.parent
+VISION_CACHE_FILE = BASE_DIR / 'vision_cache.json'
 MAX_RETRIES = 3
 REQUEST_TIMEOUT = 30
 
@@ -19,7 +21,7 @@ class VisionAnalyzer:
     def __init__(self):
         self.cache = self._load_cache()
         self.api_calls_count = 0
-        self.api_calls_cost = 0  # Pour tracking des coûts
+        self.api_calls_cost = 0  
     
     def _load_cache(self) -> Dict:
         """Charge le cache depuis le fichier"""
