@@ -153,7 +153,8 @@ class FinAssistCopilot {
                 this.removeTypingIndicator();
                 if (!resp.ok) {
                     const data = await resp.json().catch(() => ({}));
-                    this.addChatMessage('ai', `❌ Error: ${data.error || 'Server error.'}`);
+                    const extra = data.message ? ` ${data.message}` : '';
+                    this.addChatMessage('ai', `❌ Error: ${data.error || 'Server error.'}${extra}`);
                 } else {
                     const data = await resp.json();
                     this.addChatMessage('ai', data.answer || 'No answer received.');

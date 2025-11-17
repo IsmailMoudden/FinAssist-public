@@ -1,13 +1,13 @@
-# Vision (Description d'image)
+# Vision (Image Analysis)
 
-## Fichier : `utils/vision.py`
+## File: `utils/vision.py`
 
-### Fonctionnalité
-Analyse robuste d'images avec cache intelligent et gestion d'erreurs avancée. Permet d'obtenir des descriptions détaillées de graphiques, tableaux et images dans les documents financiers.
+### Purpose
+Deliver robust image analysis with caching, error tolerance, and specialized logic for charts, tables, and general visuals found inside financial documents.
 
-### Implémentation robuste
+### Implementation Overview
 
-#### **Classe VisionAnalyzer**
+#### `VisionAnalyzer` class
 ```python
 class VisionAnalyzer:
     def __init__(self):
@@ -15,108 +15,107 @@ class VisionAnalyzer:
         self.api_calls_count = 0
 ```
 
-#### **Fonctions principales**
-- `describe_image(image_bytes)` : Analyse générale d'image
-- `describe_chart(image_bytes)` : Analyse spécialisée pour graphiques
-- `describe_table(image_bytes)` : Analyse spécialisée pour tableaux
-- `get_vision_stats()` : Statistiques d'utilisation
+#### Primary Methods
+- `describe_image(image_bytes)`: general-purpose analysis
+- `describe_chart(image_bytes)`: chart-specific interpretation
+- `describe_table(image_bytes)`: table-specific extraction
+- `get_vision_stats()`: usage and cache metrics
 
-### Fonctionnalités avancées
+### Advanced Capabilities
 
-#### **1. Cache intelligent**
-- Sauvegarde automatique des résultats dans `vision_cache.json`
-- Évite les appels API répétés pour les mêmes images
-- Gestion de la mémoire optimisée
+#### 1. Intelligent Cache
+- Persists responses in `vision_cache.json`
+- Skips redundant API calls when hashes match
+- Keeps memory footprint predictable
 
-#### **2. Optimisation d'images**
-- Compression progressive (90% → 70% qualité)
-- Redimensionnement automatique (max 1200px)
-- Taille maximale : 800KB pour l'API
+#### 2. Image Optimization
+- Progressive compression from 90% down to 70% quality
+- Automatic resizing with a 1,200 px cap
+- Rejects images above 800 KB after optimization
 
-#### **3. Gestion d'erreurs robuste**
-- Retry automatique (3 tentatives)
-- Backoff exponentiel
-- Fallback vers OCR si échec
-- Timeout configurable (30s)
+#### 3. Resilient Error Handling
+- Automatic retry (up to three attempts)
+- Exponential backoff between retries
+- OCR fallback when the vision response fails
+- Configurable timeout (30 seconds)
 
-#### **4. Détection de type d'image**
+#### 4. Image Type Detection
 ```python
 def analyze_image_type(image_bytes):
-    # Détecte si chart, possible_chart, ou image
-    # Utilise OpenCV pour analyse de métriques
+    # Returns chart, possible_chart, or image
+    # Relies on OpenCV metrics
 ```
 
-### Intégration dans le pipeline
+### Pipeline Integration
 
-#### **Extraction PDF avec images**
+#### PDF Extraction with Images
 ```python
 # utils/pdf.py
 def extract_pdf_text_images_and_pages(pdf_bytes):
-    # Extrait texte ET images des PDFs
-    # Analyse automatique du type d'image
-    # Optimisation pour l'API vision
+    # Extract text and images
+    # Auto-detect type per image
+    # Optimize payloads
 ```
 
-#### **Analyse dans app.py**
+#### Application Flow
 ```python
-# Pour chaque image trouvée dans le PDF
+# app.py
 if img_data['type'] == 'chart':
     analysis = describe_chart(img_data['data'])
-    return f"📊 [Graphique page {page_num}] {analysis}"
+    return f"[Chart page {page_num}] {analysis}"
 ```
 
-### Types d'analyse spécialisés
+### Specialized Analysis Types
 
-#### **📊 Graphiques (Charts)**
-- Détection automatique via métriques OpenCV
-- Analyse des barres, lignes, circulaires
-- Extraction des tendances et valeurs
-- Focus sur insights financiers
+#### Charts
+- OpenCV-based detection with density and edge metrics
+- Handles bar, line, and pie charts
+- Extracts trends and numeric highlights
+- Emphasizes financially relevant commentary
 
-#### **📋 Tableaux**
-- Détection de lignes horizontales/verticales
-- Extraction de données structurées
-- Métriques financières (ROI, NAV, etc.)
+#### Tables
+- Detects horizontal and vertical lines
+- Reconstructs structured cells
+- Surfaces KPIs (ROI, NAV, growth, etc.)
 
-#### **🖼️ Images générales**
-- Description contextuelle
-- Éléments visuels importants
-- Contexte financier
+#### General Images
+- Produces contextual descriptions
+- Calls attention to visual cues tied to finance
 
-### Métriques de performance
+### Performance Metrics
 
-#### **Détection de graphiques**
+#### Chart Detection
 ```python
 def calculate_chart_metrics(img_array):
-    # Densité de pixels non-blancs
-    # Variance des couleurs
-    # Nombre de lignes droites (axes)
-    # Nombre de rectangles (barres)
+    # Non-white pixel density
+    # Color variance
+    # Count of straight lines (axes)
+    # Count of rectangles (bars)
 ```
 
-#### **Score de probabilité**
-- `> 0.6` : Chart confirmé
-- `> 0.3` : Possible chart
-- `< 0.3` : Image générale
+#### Probability Score
+- `> 0.6`: confirmed chart
+- `> 0.3`: possible chart
+- `< 0.3`: general image
 
 ### Configuration
 
-#### **Variables d'environnement**
+#### Environment Variable
 ```bash
 OPENROUTER_API_KEY=your_api_key
 ```
 
-#### **Paramètres configurables**
+#### Tunable Parameters
 ```python
 MAX_RETRIES = 3
 REQUEST_TIMEOUT = 30
-VISION_CACHE_FILE = 'vision_cache.json'
+VISION_CACHE_FILE = "vision_cache.json"
 ```
 
-### Endpoints API
+### API Endpoints
 
-#### **GET /vision/stats**
-Retourne les statistiques d'utilisation :
+#### `GET /vision/stats`
+Returns:
 ```json
 {
     "api_calls": 15,
@@ -125,69 +124,69 @@ Retourne les statistiques d'utilisation :
 }
 ```
 
-### Exemples d'utilisation
+### Usage Example
 
-#### **Question : "Que montrent les graphiques ?"**
+#### Prompt: "What do the charts show?"
 ```
-📊 **Analyse des graphiques :**
+Chart Analysis
 
-**Graphique 1 (page 3) :**
-- Type : Graphique en barres
-- Données : Revenus trimestriels Q1-Q4 2023
-- Tendance : Croissance de 15% Q1 à Q4
-- Point clé : Q4 montre une accélération de +8% vs Q3
+Chart 1 (page 3):
+- Type: bar chart
+- Data: quarterly revenue Q1-Q4 2023
+- Trend: 15% growth from Q1 to Q4
+- Note: Q4 accelerates eight percentage points over Q3
 
-**Graphique 2 (page 5) :**
-- Type : Graphique circulaire
-- Données : Répartition des investissements
-- Insights : Tech (45%), Finance (30%), Healthcare (25%)
+Chart 2 (page 5):
+- Type: pie chart
+- Data: investment allocation
+- Insight: Technology 45%, Finance 30%, Healthcare 25%
 ```
 
-### Améliorations futures
+### Future Work
 
-#### **1. Modèles locaux**
-- Intégration BLIP-2 pour analyse offline
-- Réduction des coûts API
-- Confidentialité renforcée
+#### Local Models
+- Integrate BLIP-2 or equivalent
+- Reduce dependency on hosted APIs
+- Improve confidentiality posture
 
-#### **2. Analyse avancée**
-- Reconnaissance de logos d'entreprises
-- Détection de signatures
-- Extraction de données tabulaires
+#### Advanced Analysis
+- Corporate logo detection
+- Signature verification
+- Structured table extraction
 
-#### **3. Optimisations**
-- Cache Redis pour performance
-- Compression d'images plus intelligente
-- Parallélisation des analyses
+#### Optimizations
+- Redis cache
+- Smarter compression strategy
+- Parallel processing of image batches
 
-### Tests
+### Testing
 
-#### **Script de test**
+#### Test Script
 ```bash
 python test_vision.py
 ```
 
-#### **Tests inclus**
-- ✅ Imports des modules
-- ✅ API vision fonctionnelle
-- ✅ Extraction PDF avec images
-- ✅ Statistiques de vision
-- ✅ Cache intelligent
+#### Covered Scenarios
+- Module imports
+- Vision API call
+- PDF extraction with images
+- Vision statistics
+- Cache persistence
 
 ### Monitoring
 
-#### **Logs détaillés**
+#### Sample Logs
 ```
-📄 Traitement fichier: financial-report.pdf
-🔍 Extraction PDF avec images...
-📊 Analyse de 3 images page 2...
-✅ Image optimisée: 245760 -> 156432 bytes
-🔄 Appel API vision (tentative 1/3)...
-✅ API vision réussie (appel #15)
+Processing file: financial-report.pdf
+Extracting PDF with images...
+Analyzing three images on page 2...
+Image optimized: 245760 -> 156432 bytes
+Calling vision API (attempt 1/3)...
+Vision API succeeded (call #15)
 ```
 
-#### **Métriques de performance**
-- Temps de traitement par fichier
-- Nombre d'images analysées
-- Taux de cache hit
-- Coût API estimé 
+#### Tracked Metrics
+- Processing time per document
+- Number of analyzed images
+- Cache hit ratio
+- Estimated API cost

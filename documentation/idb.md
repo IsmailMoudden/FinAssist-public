@@ -1,32 +1,32 @@
-# Stockage IndexedDB (PDF locaux)
+# IndexedDB Storage (Local PDFs)
 
-## Fichier : `static/src/js/idb.js`
+## File: `static/src/js/idb.js`
 
-### Fonctionnalité
-Permet de stocker, retrouver et supprimer des fichiers PDF localement dans le navigateur de l'utilisateur, pour une expérience offline et une gestion persistante des documents uploadés.
+### Purpose
+Persist uploaded PDFs in the end-user browser so documents remain available offline and across page reloads.
 
-### Implémentation
-- Utilise l'API IndexedDB via JavaScript natif.
-- Fonctions principales :
-  - `savePDF(id, file)` : sauvegarde un PDF avec un identifiant unique.
-  - `getPDF(id)` : récupère un PDF par son identifiant.
-  - `getAllPDFs()` : liste tous les PDF stockés.
-  - `deletePDF(id)` : supprime un PDF par son identifiant.
-- Structure de la base :
-  - Nom : `finassist-pdf-db`
-  - Store : `pdfs` (clé primaire : `id`)
+### Implementation
+- Uses the native IndexedDB API.
+- Core helpers:
+  - `savePDF(id, file)`: persist a PDF under a unique identifier.
+  - `getPDF(id)`: fetch a PDF by identifier.
+  - `getAllPDFs()`: list every stored PDF entry.
+  - `deletePDF(id)`: remove a stored PDF.
+- Database layout:
+  - Name: `finassist-pdf-db`
+  - Object store: `pdfs` (primary key `id`)
 
-### Points techniques
-- Permet la persistance des documents même après refresh ou fermeture du navigateur.
-- Utilisé par le front pour recharger les PDF locaux à l'initialisation.
-- Compatible avec la gestion de l'UI (drag & drop, suppression, etc.).
+### Technical Notes
+- Documents survive refreshes and browser restarts.
+- The frontend reloads persisted PDFs during initialization to repopulate the UI.
+- Drag-and-drop, delete, and selection flows leverage these helpers for consistent state.
 
-### Limites
-- Stockage limité par le navigateur (généralement quelques centaines de Mo).
-- Pas de synchronisation entre appareils.
-- Pas de chiffrement natif.
+### Current Limitations
+- Storage quotas vary by browser (typically a few hundred megabytes).
+- No cross-device synchronization.
+- Data is stored unencrypted.
 
-### Améliorations possibles
-- Ajouter le chiffrement des fichiers stockés.
-- Gérer la synchronisation cloud (IndexedDB + backend).
-- Ajouter la gestion des versions de documents. 
+### Potential Improvements
+- Add client-side encryption before persisting files.
+- Sync IndexedDB entries to a backend for multi-device continuity.
+- Track document versions and metadata to support collaboration.

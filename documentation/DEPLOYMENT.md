@@ -1,16 +1,16 @@
-# 🚀 Déploiement FinAssist sur Railway
+# FinAssist Deployment on Railway
 
-## 📋 Prérequis
+## Prerequisites
 
-1. **Compte Railway** : [railway.app](https://railway.app)
-2. **GitHub Repository** : Votre code doit être sur GitHub
-3. **Variables d'environnement** : OPENROUTER_API_KEY
+1. Railway account: [railway.app](https://railway.app)
+2. GitHub repository containing the FinAssist codebase
+3. Environment variable `OPENROUTER_API_KEY`
 
-## 🔧 Configuration
+## Configuration
 
-### **1. Variables d'Environnement**
+### 1. Environment Variables
 
-Dans Railway, configurez ces variables :
+Configure the following values inside Railway:
 
 ```bash
 OPENROUTER_API_KEY=your_openrouter_api_key_here
@@ -18,54 +18,54 @@ FLASK_ENV=production
 PORT=5002
 ```
 
-### **2. Fichiers de Configuration**
+### 2. Project Files
 
-✅ **Procfile** : `web: python app.py`
-✅ **runtime.txt** : `python-3.12.0`
-✅ **railway.json** : Configuration Railway
-✅ **requirements.txt** : Dépendances Python
+- `Procfile`: `web: python app.py`
+- `runtime.txt`: `python-3.12.0`
+- `railway.json`: Railway configuration
+- `requirements.txt`: Python dependencies
 
-## 🚀 Déploiement
+## Deployment
 
-### **Méthode 1 : Via Railway Dashboard**
+### Method 1: Railway Dashboard
 
-1. **Connectez votre GitHub** à Railway
-2. **Sélectionnez votre repository** FinAssist
-3. **Configurez les variables d'environnement**
-4. **Déployez automatiquement**
+1. Connect your GitHub account to Railway.
+2. Select the FinAssist repository.
+3. Configure environment variables.
+4. Trigger an automatic deployment.
 
-### **Méthode 2 : Via CLI Railway**
+### Method 2: Railway CLI
 
 ```bash
-# Installer Railway CLI
+# Install the Railway CLI
 npm install -g @railway/cli
 
-# Login
+# Authenticate
 railway login
 
-# Lier le projet
+# Link the local project to a Railway service
 railway link
 
-# Déployer
+# Deploy
 railway up
 ```
 
-## 🔍 Vérification
+## Verification
 
-### **Endpoints de Test**
+### Test Endpoints
 
 ```bash
-# Santé de l'application
+# Application health
 curl https://your-app.railway.app/health
 
-# Stats Vision
+# Vision statistics
 curl https://your-app.railway.app/vision/stats
 
-# Interface principale
-https://your-app.railway.app/
+# Web interface
+open https://your-app.railway.app/
 ```
 
-### **Réponses Attendues**
+### Expected Responses
 
 ```json
 // GET /health
@@ -83,58 +83,58 @@ https://your-app.railway.app/
 }
 ```
 
-## 📊 Monitoring
+## Monitoring
 
-### **Logs Railway**
+### Railway Logs
 ```bash
 railway logs
 ```
 
-### **Variables d'Environnement**
+### Environment Variables
 ```bash
 railway variables
 ```
 
-### **Statut du Service**
+### Service Status
 ```bash
 railway status
 ```
 
-## 🔧 Dépannage
+## Troubleshooting
 
-### **Problèmes Courants**
+### Common Issues
 
-#### **1. Port déjà utilisé**
+#### 1. Port Already in Use
 ```bash
-# Vérifier les processus
+# Identify processes listening on 5002
 lsof -ti:5002
 
-# Tuer le processus
+# Terminate the process
 lsof -ti:5002 | xargs kill -9
 ```
 
-#### **2. Dépendances manquantes**
+#### 2. Missing Dependencies
 ```bash
-# Vérifier requirements.txt
+# Ensure requirements are installed
 pip install -r requirements.txt
 
-# Installer manuellement si besoin
+# Manually install if needed
 pip install PyMuPDF opencv-python numpy
 ```
 
-#### **3. Variables d'environnement**
+#### 3. Environment Variables
 ```bash
-# Vérifier .env
+# Inspect local .env
 cat .env
 
-# Tester l'API key
+# Validate the API key
 curl -H "Authorization: Bearer $OPENROUTER_API_KEY" \
      https://openrouter.ai/api/v1/models
 ```
 
-## 🎯 Configuration Avancée
+## Advanced Configuration
 
-### **Scaling**
+### Scaling
 ```json
 // railway.json
 {
@@ -145,56 +145,56 @@ curl -H "Authorization: Bearer $OPENROUTER_API_KEY" \
 }
 ```
 
-### **Variables d'Environnement Avancées**
+### Additional Environment Profiles
 ```bash
 # Production
 FLASK_ENV=production
 PORT=5002
 OPENROUTER_API_KEY=your_key
 
-# Développement
+# Development
 FLASK_ENV=development
 DEBUG=true
 ```
 
-## 📈 Performance
+## Performance
 
-### **Optimisations**
-- ✅ **Cache intelligent** pour les analyses vision
-- ✅ **Compression d'images** automatique
-- ✅ **Gestion d'erreurs** robuste
-- ✅ **Logs détaillés** pour monitoring
+### Optimizations
+- Intelligent cache for vision analysis
+- Automatic image compression
+- Resilient error handling
+- Detailed logging for observability
 
-### **Métriques**
-- **Temps de réponse** : < 30s pour analyses vision
-- **Cache hit rate** : > 80% après utilisation
-- **Uptime** : > 99.9% avec Railway
+### Metrics
+- Response time: under 30 seconds for vision analysis
+- Cache hit rate: above 80 percent after warm-up
+- Uptime: above 99.9 percent under Railway
 
-## 🔒 Sécurité
+## Security
 
-### **Variables Sensibles**
-- ✅ **OPENROUTER_API_KEY** : Configuré dans Railway
-- ✅ **Pas de clés en dur** dans le code
-- ✅ **HTTPS** automatique avec Railway
+### Sensitive Variables
+- `OPENROUTER_API_KEY` stored securely in Railway
+- No secrets committed to the repository
+- HTTPS enforced by Railway
 
-### **CORS et Headers**
+### CORS and Headers
 ```python
-# Ajouté automatiquement par Railway
-# Pas de configuration CORS nécessaire
+# Managed by Railway by default
+# No manual CORS configuration is required
 ```
 
-## 🎉 Déploiement Réussi
+## Successful Deployment
 
-Une fois déployé, votre FinAssist sera accessible sur :
+Once deployed, FinAssist is available at:
 ```
 https://your-app-name.railway.app
 ```
 
-### **Fonctionnalités Disponibles**
-- ✅ **Interface web** complète
-- ✅ **API Vision** fonctionnelle
-- ✅ **Upload de PDFs** avec analyse d'images
-- ✅ **Cache intelligent** pour performance
-- ✅ **Monitoring** en temps réel
+### Available Features
+- Full web interface
+- Operational vision API
+- PDF upload with image analysis
+- Intelligent cache for performance
+- Real-time monitoring
 
-**Votre FinAssist avec Vision est maintenant en production ! 🚀** 
+FinAssist with Vision is now live in production.

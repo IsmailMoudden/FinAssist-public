@@ -9,6 +9,40 @@ import time
 
 load_dotenv()
 OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
+MAX_TOKENS_PER_REQUEST = int(os.getenv('MAX_TOKENS_PER_REQUEST', '300'))
+RATE_LIMIT_CONTACT = os.getenv('RATE_LIMIT_CONTACT', 'ismail.moudden1@gmail.com')
+MAX_REQUESTS_PER_WINDOW = int(os.getenv('MAX_REQUESTS_PER_WINDOW', '5'))
+REQUEST_WINDOW_SECONDS = int(os.getenv('REQUEST_WINDOW_SECONDS', '3600'))
+RATE_LIMIT_MESSAGE = (
+    "Demo rate limit enforced: only very short prompts and a handful of API calls "
+    f"are supported. Please contact {RATE_LIMIT_CONTACT} for extended access."
+)
+_request_window_start = time.time()
+_request_count = 0
+
+
+def estimate_tokens(text: str) -> int:
+    # Rough approximation: count whitespace-separated chunks
+    return len(text.split())
+
+
+def check_request_limit():
+    global _request_window_start, _request_count
+    if MAX_REQUESTS_PER_WINDOW <= 0:
+        return None
+    now = time.time()
+    if now - _request_window_start > REQUEST_WINDOW_SECONDS:
+        _request_window_start = now
+        _request_count = 0
+    if _request_count >= MAX_REQUESTS_PER_WINDOW:
+        return {
+            'error': 'rate_limited',
+            'message': RATE_LIMIT_MESSAGE,
+            'limit_requests': MAX_REQUESTS_PER_WINDOW,
+            'window_seconds': REQUEST_WINDOW_SECONDS
+        }
+    _request_count += 1
+    return None
 
 SYSTEM_PROMPT = (
     "Tu es un assistant expert en analyse de documents financiers (fonds, private credit, BDC, etc.), mais tu sais aussi traiter d'autres types de documents.\n"
@@ -113,6 +147,10 @@ def ask():
 
     print(f"📝 Contenu total: {len(full_text)} caractères")
 
+    request_limit_error = check_request_limit()
+    if request_limit_error:
+        return jsonify(request_limit_error), 429
+
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "Content-Type": "application/json"
@@ -124,6 +162,15 @@ def ask():
             {"role": "user", "content": user_prompt}
         ]
     }
+
+    estimated_tokens = estimate_tokens(user_prompt)
+    if estimated_tokens > MAX_TOKENS_PER_REQUEST:
+        return jsonify({
+            'error': 'rate_limited',
+            'message': RATE_LIMIT_MESSAGE,
+            'limit_tokens': MAX_TOKENS_PER_REQUEST,
+            'estimated_tokens': estimated_tokens
+        }), 429
     
     try:
         resp = requests.post(

@@ -1,76 +1,76 @@
-# Améliorations & Architecture Production
+# Production Architecture & Improvements
 
-## Objectif
-Passer de la démo actuelle (API OpenRouter, vision simulée, stockage local) à une plateforme robuste, scalable et souveraine, avec modèles IA locaux (vision et LLM fine-tuné) sur un serveur VPS.
-
----
-
-## 1. Architecture cible
-
-- **Backend** :
-  - Serveur VPS (Ubuntu/Debian recommandé)
-  - API Python (Flask ou FastAPI)
-  - Modèle LLM local (ex : Llama.cpp, Ollama, vLLM, ou HuggingFace Transformers)
-  - Modèle vision local (ex : BLIP, Donut, TrOCR, PaddleOCR)
-  - Extraction PDF/OCR/vision en local
-  - Stockage fichiers sur disque ou base de données
-- **Frontend** :
-  - React/Vue ou HTML+JS (comme la démo)
-  - Authentification, gestion des utilisateurs
-  - Stockage cloud ou synchronisation possible
+## Objective
+Modernize the current demo (OpenRouter API, simulated vision, local storage) into a hardened, scalable platform that runs local vision and language models on a dedicated VPS.
 
 ---
 
-## 2. Implémentation technique (étapes)
+## 1. Target Architecture
 
-### a) Déploiement serveur
-- Prendre un VPS (OVH, Scaleway, Hetzner, etc.)
-- Installer Python, Node, Docker (optionnel)
-- Déployer l’API Flask/FastAPI (gunicorn + nginx recommandé)
-
-### b) Modèle LLM local
-- Installer un modèle open-source (Llama 2, Mistral, Phi, etc.) via Ollama, vLLM, ou Transformers
-- Adapter l’API pour interroger le modèle local (remplacer l’appel OpenRouter par un appel local)
-- Fine-tuner le modèle sur des corpus financiers si besoin (HuggingFace, LoRA, QLoRA)
-- Gérer la mémoire GPU/CPU selon la taille du modèle
-
-### c) Modèle vision local
-- Installer BLIP, Donut, TrOCR, ou PaddleOCR (selon besoin)
-- Adapter la fonction `describe_image` pour appeler le modèle local (ex : via Transformers ou API REST locale)
-- Gérer le pré/post-traitement des images (OpenCV, PIL)
-
-### d) Extraction PDF/OCR
-- Garder la logique actuelle (PyPDF2, pytesseract), mais prévoir fallback OCR automatique sur pages scannées
-- Ajouter extraction de tableaux (camelot, tabula)
-
-### e) Stockage & sécurité
-- Stocker les fichiers sur disque ou dans une base (PostgreSQL, S3, etc.)
-- Ajouter authentification JWT, gestion des droits
-- Chiffrer les données sensibles
+- **Backend**
+  - VPS running Ubuntu or Debian
+  - Python API (Flask or FastAPI)
+  - Local LLM (for example Llama.cpp, Ollama, vLLM, or Hugging Face Transformers)
+  - Local vision model (BLIP, Donut, TrOCR, PaddleOCR)
+  - On-prem PDF, OCR, and vision processing
+  - File storage on disk or in a database
+- **Frontend**
+  - React, Vue, or the current HTML+JS client
+  - Authentication and user management
+  - Optional cloud sync
 
 ---
 
-## 3. Rapprochement avec l’implémentation actuelle
+## 2. Technical Implementation Roadmap
 
-- **API Flask** : déjà en place, à étendre pour supporter les modèles locaux
-- **Extraction PDF/OCR** : réutilisable, à améliorer pour fallback automatique
-- **Vision** : remplacer la simulation par un vrai modèle (voir `utils/vision.py`)
-- **LLM** : remplacer l’appel OpenRouter par un appel local (voir `/ask` dans `app.py`)
-- **Frontend** : peut être conservé, mais à migrer vers build Tailwind pour la prod
-- **Stockage** : IndexedDB pour le local, à compléter par un backend pour la synchro multi-utilisateur
+### a) Server Deployment
+- Provision a VPS (OVH, Scaleway, Hetzner, etc.)
+- Install Python, Node.js, and optionally Docker
+- Deploy the Flask/FastAPI service with gunicorn and nginx
+
+### b) Local LLM
+- Install an open-source model (Llama 2, Mistral, Phi, etc.) via Ollama, vLLM, or Transformers
+- Update the API to call the local model instead of OpenRouter
+- Fine-tune with financial corpora when needed (Hugging Face, LoRA, QLoRA)
+- Manage GPU/CPU memory based on model size
+
+### c) Local Vision Model
+- Install BLIP, Donut, TrOCR, or PaddleOCR as required
+- Adapt `describe_image` to call the local model (Transformers runtime or REST microservice)
+- Handle pre/post-processing with OpenCV and Pillow
+
+### d) PDF/OCR Extraction
+- Keep the existing PyPDF2 and pytesseract logic while adding automatic OCR fallback for scanned pages
+- Add table extraction (Camelot, Tabula)
+
+### e) Storage and Security
+- Persist files on disk or through PostgreSQL/S3
+- Add JWT authentication and granular permissions
+- Encrypt sensitive data at rest and in transit
 
 ---
 
-## 4. Points d’attention
-- **Ressources serveur** : prévoir RAM/CPU/GPU selon la taille des modèles
-- **Sécurité** : authentification, chiffrement, monitoring
-- **Scalabilité** : possibilité de clusteriser les modèles (Kubernetes, Ray, etc.)
-- **Maintenance** : logs, monitoring, CI/CD
+## 3. Alignment With the Current Implementation
+
+- **Flask API**: already exists and only needs extended endpoints for local models
+- **PDF/OCR**: reusable; add automatic OCR fallback
+- **Vision**: replace mocks with the production-ready analyzer in `utils/vision.py`
+- **LLM**: swap OpenRouter calls for local inference inside `/ask` in `app.py`
+- **Frontend**: keep the current layout but migrate to a Tailwind build pipeline for production
+- **Storage**: IndexedDB serves local needs; add backend syncing for multi-user scenarios
 
 ---
 
-## 5. Pour aller plus loin
-- Intégrer un orchestrateur de workflow (ex : Airflow, Prefect)
-- Ajouter un moteur de recherche sémantique (ex : Qdrant, Weaviate)
-- Proposer une API REST publique/documentée
-- Mettre en place un portail d’admin pour la gestion des utilisateurs et des logs 
+## 4. Key Considerations
+- **Server resources**: size RAM/CPU/GPU for target models
+- **Security**: enforce authentication, encryption, and monitoring
+- **Scalability**: plan for model orchestration (Kubernetes, Ray, etc.)
+- **Maintainability**: implement logging, monitoring, and CI/CD
+
+---
+
+## 5. Next-Level Initiatives
+- Integrate a workflow orchestrator (Airflow, Prefect)
+- Add a semantic search engine (Qdrant, Weaviate)
+- Publish a documented REST API
+- Deliver an admin portal for user and log management

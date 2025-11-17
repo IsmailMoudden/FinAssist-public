@@ -1,10 +1,12 @@
-# Documentation technique FinAssist
+# FinAssist Technical Documentation
 
-Ce dossier regroupe la documentation technique détaillée de chaque feature de la plateforme FinAssist, ainsi que des pistes d'amélioration pour une version production avec modèles locaux et fine-tuning.
+This directory centralizes the detailed technical documentation for every FinAssist capability, along with guidelines for scaling the platform toward a production-ready, privacy-preserving deployment.
 
-- [OCR (Reconnaissance de texte)](ocr.md)
-- [Extraction PDF](pdf.md)
-- [Vision (description d'image)](vision.md)
-- [Stockage IndexedDB](idb.md)
-- [Interface utilisateur (CSS)](appcss.md)
-- [Améliorations et architecture production](improvements.md) 
+- [OCR (Text Recognition)](ocr.md)
+- [PDF Extraction](pdf.md)
+- [Vision (Image Understanding)](vision.md)
+- [IndexedDB Storage](idb.md)
+- [User Interface (CSS)](appcss.md)
+- [Production Architecture & Improvements](improvements.md)
+- [Implementation Summary](IMPLEMENTATION_SUMMARY.md)
+- [Vision Feature Overview](VISION_README.md)

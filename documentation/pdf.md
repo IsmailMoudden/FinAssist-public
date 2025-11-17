@@ -1,13 +1,13 @@
-# Extraction PDF
+# PDF Extraction
 
-## Fichier : `utils/pdf.py`
+## File: `utils/pdf.py`
 
-### Fonctionnalité
-Permet d'extraire le texte de chaque page d'un document PDF, pour l'analyse et le question answering sur documents financiers.
+### Purpose
+Extract the text of every page contained in a PDF document so the content can be indexed, analyzed, and used for question answering across financial files.
 
-### Implémentation
-- Utilise la librairie Python `PyPDF2` pour parser les fichiers PDF.
-- Fonction principale :
+### Implementation
+- Relies on the `PyPDF2` library to parse PDF files.
+- Core function:
   ```python
   def extract_pdf_text_and_pages(pdf_bytes):
       reader = PdfReader(io.BytesIO(pdf_bytes))
@@ -20,21 +20,21 @@ Permet d'extraire le texte de chaque page d'un document PDF, pour l'analyse et l
           })
       return pages
   ```
-- Prend en entrée un flux binaire PDF (upload utilisateur ou fichier statique).
-- Retourne une liste de dictionnaires `{page: numéro, text: texte}` pour chaque page.
+- Accepts raw PDF bytes originating from uploaded files or static assets.
+- Returns a list of dictionaries `{page: number, text: content}` for each page.
 
-### Points techniques
-- Gère les PDF multi-pages, même volumineux.
-- Utilise `extract_text()` de PyPDF2, qui fonctionne sur la plupart des PDF textuels (pas les scans purs).
-- Peut être appelé depuis l'API Flask pour extraire le contenu avant envoi au LLM.
+### Technical Notes
+- Handles large, multi-page PDFs.
+- Uses `extract_text()` which works for most text-based PDFs (not scanned images).
+- Integrates with the Flask API to produce structured content prior to LLM calls.
 
-### Limites
-- Ne gère pas les PDF scannés (images) : il faut passer par l'OCR pour ceux-ci.
-- La qualité de l'extraction dépend de la structure du PDF (texte accessible ou non).
-- Pas d'extraction des images, tableaux, ou métadonnées avancées dans la version actuelle.
+### Current Limitations
+- Scanned PDFs are not supported; they must be routed through OCR first.
+- Output quality depends on the document structure and the availability of text layers.
+- Image, table, and metadata extraction are not covered in the current version.
 
-### Améliorations possibles
-- Détection automatique des pages scannées et fallback OCR.
-- Extraction des tableaux (ex : camelot, tabula).
-- Extraction des métadonnées, signets, annotations.
-- Support des PDF protégés par mot de passe. 
+### Potential Improvements
+- Automatic detection of scanned pages with OCR fallback.
+- Table extraction via libraries such as Camelot or Tabula.
+- Metadata, bookmarks, and annotation extraction.
+- Support for password-protected PDFs.

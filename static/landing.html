@@ -1,29 +1,32 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Connexion - FinAssist</title>
+  <title>Login - FinAssist</title>
   <link rel="stylesheet" href="src/css/landing.css">
 </head>
 <body>
   <div class="background-lines">
     <svg id="bg-lines-svg" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
   </div>
-  <button id="theme-toggle" class="theme-toggle" aria-label="Changer le thème">
+  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
     <span id="theme-toggle-icon"></span>
   </button>
   <main class="centered-form">
+    <p class="demo-note">
+      Demo version: enter any username or password to continue.
+    </p>
     <form id="login-form" autocomplete="off">
       <div class="form-group">
         <input type="text" id="username" name="username" required placeholder=" " />
-        <label for="username">Nom d'utilisateur</label>
+        <label for="username">Username</label>
       </div>
       <div class="form-group">
         <input type="password" id="password" name="password" required placeholder=" " />
-        <label for="password">Mot de passe</label>
+        <label for="password">Password</label>
       </div>
-      <button type="submit">Connexion</button>
+      <button type="submit">Sign in</button>
     </form>
   </main>
   <script src="src/js/landing.js"></script>

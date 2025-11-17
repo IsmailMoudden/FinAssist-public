@@ -1,170 +1,169 @@
-# 🎯 Vision FinAssist - Analyse d'Images Intelligente
+# FinAssist Vision — Image Intelligence Overview
 
-## Vue d'ensemble
+## Overview
 
-La fonctionnalité **Vision** de FinAssist permet d'analyser automatiquement les images, graphiques et tableaux dans vos documents financiers. Elle utilise l'IA pour extraire des insights visuels et les intégrer à l'analyse textuelle.
+The FinAssist Vision capability analyzes images, charts, and tables embedded in financial documents. It combines classical computer vision with LLM prompts to generate visual insights that complement the textual analysis pipeline.
 
-## ✨ Fonctionnalités
+## Features
 
-### 📊 Analyse de Graphiques
-- **Détection automatique** des graphiques dans les PDFs
-- **Analyse spécialisée** pour barres, lignes, circulaires
-- **Extraction des tendances** et valeurs numériques
-- **Insights financiers** pertinents
+### Chart Analysis
+- Automatic detection of charts inside PDFs
+- Specialized processing for bar, line, and pie charts
+- Extraction of trends and quantitative values
+- Delivery of finance-relevant narratives
 
-### 📋 Analyse de Tableaux
-- **Reconnaissance de structure** tabulaire
-- **Extraction de données** financières
-- **Métriques clés** (ROI, NAV, etc.)
-- **Présentation structurée**
+### Table Analysis
+- Recognition of tabular layouts
+- Extraction of structured financial metrics
+- Highlighting of KPIs such as ROI, NAV, and growth
+- Clean, hierarchical responses
 
-### 🖼️ Analyse d'Images Générales
-- **Description contextuelle** des éléments visuels
-- **Reconnaissance d'objets** et logos
-- **Contexte financier** adapté
+### General Image Analysis
+- Contextual descriptions of graphics, photos, and diagrams
+- Object and logo detection
+- Explanations aligned with the document’s business context
 
-## 🚀 Installation
+## Installation
 
-### 1. Dépendances
+### 1. Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Configuration
+### 2. Environment
 ```bash
 # .env
 OPENROUTER_API_KEY=your_api_key_here
 ```
 
-### 3. Test
+### 3. Tests
 ```bash
 python test_vision.py
 ```
 
-## 📖 Utilisation
+## Usage
 
-### Upload de Documents
-1. **Glissez-déposez** vos PDFs dans l'interface
-2. **Les images sont automatiquement détectées** et analysées
-3. **Posez vos questions** sur le contenu visuel
+### Document Upload
+1. Drag and drop PDFs into the interface.
+2. Detected images are queued for analysis automatically.
+3. Ask questions about the visual content inside the chat.
 
-### Exemples de Questions
+### Example Questions
 ```
-"Que montrent les graphiques de la page 3 ?"
-"Quelle est la performance selon les tableaux ?"
-"Analysez les tendances visibles dans ce document"
-"Que représentent les diagrammes circulaires ?"
-```
-
-### Réponses Typiques
-```
-📊 **Analyse des graphiques - Page 3 :**
-
-**Graphique 1 (en haut à gauche) :**
-- Type : Graphique en barres
-- Données : Revenus trimestriels Q1-Q4 2023
-- Tendance : Croissance de 15% Q1 à Q4
-- Point clé : Q4 montre une accélération de +8% vs Q3
-
-**Graphique 2 (en bas à droite) :**
-- Type : Graphique circulaire
-- Données : Répartition des investissements par secteur
-- Insights : Tech (45%), Finance (30%), Healthcare (25%)
+What do the charts on page 3 show?
+How do the tables summarize performance?
+Describe the trends visible in this document.
+What do the pie charts represent?
 ```
 
-## 🔧 Architecture Technique
-
-### Pipeline de Traitement
+### Example Responses
 ```
-PDF Upload → Extraction Images → Détection Type → Optimisation → API Vision → Cache → Réponse
+Chart Analysis — Page 3
+
+Chart 1 (top left):
+- Type: bar chart
+- Data: quarterly revenue Q1-Q4 2023
+- Trend: 15% growth from Q1 to Q4
+- Insight: Q4 accelerates eight percentage points over Q3
+
+Chart 2 (bottom right):
+- Type: pie chart
+- Data: investment allocation by sector
+- Insight: Technology 45%, Finance 30%, Healthcare 25%
 ```
 
-### Composants Principaux
+## Technical Architecture
 
-#### **1. Extraction PDF (`utils/pdf.py`)**
+### Processing Pipeline
+```
+PDF upload -> Image extraction -> Type detection -> Optimization -> Vision API -> Cache -> Response
+```
+
+### Core Components
+
+#### 1. PDF Extraction (`utils/pdf.py`)
 ```python
 def extract_pdf_text_images_and_pages(pdf_bytes):
-    # Extrait texte ET images
-    # Analyse automatique du type d'image
-    # Optimisation pour l'API
+    # Extract text and images
+    # Classify image types automatically
+    # Optimize payloads for downstream analysis
 ```
 
-#### **2. Analyse Vision (`utils/vision.py`)**
+#### 2. Vision Analysis (`utils/vision.py`)
 ```python
 class VisionAnalyzer:
-    def describe_chart(image_bytes)    # Graphiques
-    def describe_table(image_bytes)    # Tableaux
-    def describe_image(image_bytes)    # Images générales
+    def describe_chart(image_bytes)
+    def describe_table(image_bytes)
+    def describe_image(image_bytes)
 ```
 
-#### **3. Intégration API (`app.py`)**
+#### 3. API Integration (`app.py`)
 ```python
-# Analyse automatique des images PDF
 if p.get('images'):
     for img in p['images']:
         analysis = analyze_image_from_pdf(img, p['page'])
 ```
 
-## 📊 Métriques et Performance
+## Metrics and Performance
 
-### Cache Intelligent
-- **Sauvegarde automatique** des résultats
-- **Évite les appels API** répétés
-- **Optimisation mémoire** intégrée
+### Intelligent Cache
+- Automatically persists responses
+- Avoids redundant API calls
+- Keeps memory usage predictable
 
-### Optimisation d'Images
-- **Compression progressive** (90% → 70%)
-- **Redimensionnement automatique** (max 1200px)
-- **Taille maximale** : 800KB pour l'API
+### Image Optimization
+- Progressive compression (90% down to 70%)
+- Automatic resizing up to 1,200 px
+- Maximum payload size of 800 KB
 
-### Gestion d'Erreurs
-- **Retry automatique** (3 tentatives)
-- **Backoff exponentiel**
-- **Fallback OCR** si échec
-- **Timeout configurable** (30s)
+### Error Handling
+- Automatic retry with up to three attempts
+- Exponential backoff between retries
+- OCR fallback if the vision model fails
+- Configurable timeout (30 seconds)
 
-## 🎯 Types de Documents Supportés
+## Supported Documents
 
-### 📈 Rapports Financiers
-- Graphiques de performance
-- Tableaux de métriques
-- Diagrammes de répartition
+### Financial Reports
+- Performance charts
+- Metric tables
+- Allocation diagrams
 
-### 📊 Présentations d'Investissement
-- Slides avec graphiques
-- Tableaux de données
-- Infographies
+### Investment Presentations
+- Slides with charts
+- Tabular datasets
+- Infographics
 
-### 📋 Documents Réglementaires
-- Tableaux de conformité
-- Graphiques de risque
-- Diagrammes de flux
+### Regulatory Filings
+- Compliance tables
+- Risk metrics
+- Process flows
 
-## 🔍 Détection Intelligente
+## Intelligent Detection
 
-### Algorithme de Classification
+### Classification Algorithm
 ```python
 def analyze_image_type(image_bytes):
-    # Métriques OpenCV
-    # Densité de pixels
-    # Variance des couleurs
-    # Détection de lignes/rectangles
-    # Score de probabilité
+    # OpenCV metrics
+    # Pixel density
+    # Color variance
+    # Line/rectangle detection
+    # Probability scoring
 ```
 
-### Scores de Confiance
-- **> 0.6** : Chart confirmé
-- **> 0.3** : Possible chart
-- **< 0.3** : Image générale
+### Confidence Scores
+- `> 0.6`: confirmed chart
+- `> 0.3`: potential chart
+- `< 0.3`: general image
 
-## 📈 Monitoring
+## Monitoring
 
-### Endpoint de Statistiques
+### Statistics Endpoint
 ```bash
 GET /vision/stats
 ```
 
-### Réponse
+### Sample Response
 ```json
 {
     "api_calls": 15,
@@ -174,19 +173,19 @@ GET /vision/stats
 }
 ```
 
-### Logs Détaillés
+### Sample Logs
 ```
-📄 Traitement fichier: financial-report.pdf
-🔍 Extraction PDF avec images...
-📊 Analyse de 3 images page 2...
-✅ Image optimisée: 245760 -> 156432 bytes
-🔄 Appel API vision (tentative 1/3)...
-✅ API vision réussie (appel #15)
+Processing file: financial-report.pdf
+Extracting PDF with images...
+Analyzing three images on page 2...
+Image optimized: 245760 -> 156432 bytes
+Calling vision API (attempt 1/3)...
+Vision API succeeded (call #15)
 ```
 
-## 🛠️ Configuration Avancée
+## Advanced Configuration
 
-### Variables d'Environnement
+### Environment Variables
 ```bash
 OPENROUTER_API_KEY=your_key
 VISION_CACHE_FILE=vision_cache.json
@@ -194,67 +193,58 @@ MAX_RETRIES=3
 REQUEST_TIMEOUT=30
 ```
 
-### Paramètres de Performance
+### Performance Parameters
 ```python
-# Taille maximale d'image
 MAX_IMAGE_SIZE_KB = 800
-
-# Qualité de compression
 COMPRESSION_QUALITIES = [90, 85, 80, 75]
-
-# Timeout API
 API_TIMEOUT = 30
 ```
 
-## 🔮 Améliorations Futures
+## Future Work
 
-### 1. Modèles Locaux
-- **BLIP-2** pour analyse offline
-- **Réduction des coûts** API
-- **Confidentialité** renforcée
+### Local Models
+- Integrate BLIP-2 for offline analysis
+- Reduce dependency on external APIs
+- Improve data confidentiality
 
-### 2. Analyse Avancée
-- **Reconnaissance de logos** d'entreprises
-- **Détection de signatures**
-- **Extraction de données** tabulaires
+### Advanced Analytics
+- Corporate logo recognition
+- Signature detection
+- Structured data extraction
 
-### 3. Optimisations
-- **Cache Redis** pour performance
-- **Compression intelligente**
-- **Parallélisation** des analyses
+### Optimizations
+- Redis-backed cache
+- Smarter compression heuristics
+- Parallelized analysis pipelines
 
-## 🧪 Tests
+## Testing
 
-### Script de Test Complet
+### Full Test Script
 ```bash
 python test_vision.py
 ```
 
-### Tests Inclus
-- ✅ Imports des modules
-- ✅ API vision fonctionnelle
-- ✅ Extraction PDF avec images
-- ✅ Statistiques de vision
-- ✅ Cache intelligent
+### Covered Scenarios
+- Module imports
+- Vision API call
+- PDF extraction with images
+- Vision statistics
+- Cache persistence
 
-## 📞 Support
+## Support
 
-### Logs de Debug
+### Debug Logging
 ```python
-# Activer les logs détaillés
 import logging
 logging.basicConfig(level=logging.DEBUG)
 ```
 
-### Diagnostic
+### Diagnostics
 ```bash
-# Vérifier les dépendances
 pip list | grep -E "(opencv|numpy|pillow)"
-
-# Tester l'API
 curl -X GET http://localhost:5002/vision/stats
 ```
 
 ---
 
-**🎉 Vision FinAssist est maintenant prête à analyser vos documents financiers avec intelligence !** 
+FinAssist Vision is ready to interpret financial documents with consistent, explainable, and production-ready image intelligence.
