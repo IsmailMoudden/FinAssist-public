@@ -1,6 +1,6 @@
 # FinAssist Copilot
 
-FinAssist Copilot is a dark-themed assistant that helps analysts browse financial PDFs, extract text or images, and query an AI copilot that understands the uploaded content. The repository bundles both the interactive front-end experience and the supporting Python services responsible for OCR, PDF processing, and image understanding.
+FinAssist Copilot is a assistant that helps analysts browse financial PDFs, extract text or images, and query an AI copilot that understands the uploaded content. The repository bundles both the interactive front-end experience and the supporting Python services responsible for OCR, PDF processing, and image understanding.
 
 ![FinAssist interface preview](static/Screenshot_Demo.png)
 
